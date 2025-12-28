@@ -1,0 +1,440 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+}
+
+#tabs {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.tab-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 6px 0 6px;
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+    overflow-x: auto;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #000;
+    font-weight: normal;
+}
+
+.tab-button.active {
+    border-bottom: 2px solid #4CAF50;
+    font-weight: bold;
+    background-color: #fff;
+}
+
+.tab-button:hover {
+    background: #f0f0f0;
+}
+
+#add-tab {
+    margin-left: auto;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.tab-content {
+    background: white;
+    padding: 20px;
+    border-radius: 0 0 8px 8px;
+    box-shadow: none;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Tab styling (override generic button styles) */
+.tab-buttons .tab-button {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 6px;
+    background: #f5f5f5;
+    color: #222;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+.tab-buttons .tab-button:hover {
+    background: #eee;
+}
+
+.tab-buttons .tab-button.active {
+    background: #fff;
+    font-weight: 700;
+    box-shadow: inset 0 -2px 0 #4CAF50;
+}
+
+.tab-buttons .tab-button span {
+    color: #666;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.tab-buttons .tab-button:hover span {
+    color: #111;
+}
+
+#add-tab {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 6px;
+    line-height: 32px;
+}
+
+.tab-content {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.readings-container {
+    margin-top: 20px;
+}
+
+.tables-div {
+    width: 100%;
+}
+
+.table-section {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-section h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.readings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.readings-table th, .readings-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.readings-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+/* Completed column only needs room for a checkmark */
+.readings-table th:nth-child(2),
+.readings-table td:nth-child(2) {
+    width: 36px;
+    text-align: center;
+}
+
+.readings-table td input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.readings-table td textarea {
+    width: 100%;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    resize: none;
+    overflow: hidden;
+}
+
+.notes-section {
+    margin-top: 20px;
+}
+
+.notes-section h3 {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.notes-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.subjects-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.subjects-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.subjects-table th, .subjects-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.subjects-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.subjects-table td input[type="text"] {
+    width: 100%;
+    border: none;
+}
+
+.subjects-table th:nth-child(1),
+.subjects-table td:nth-child(1) {
+    width: 40%;
+}
+
+.subjects-table th:nth-child(n+2),
+.subjects-table td:nth-child(n+2) {
+    width: 12%;
+}
+
+.day-button {
+    width: 100%;
+    height: 30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.subjects-table td.highlighted {
+    background-color: yellow;
+}
+
+/* Print styles */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body {
+        margin: 0;
+        background: white;
+        font-size: 10px;
+    }
+    #tabs, .tab-buttons, .tab-content {
+        box-shadow: none;
+        border: none;
+        max-width: none;
+        padding: 10px;
+    }
+    button, #add-tab {
+        display: none;
+    }
+    .tab-pane {
+        display: none !important;
+    }
+    .tab-pane.active {
+        display: block !important;
+    }
+    .tab-buttons {
+        display: none;
+    }
+    .form-container {
+        display: block !important;
+        margin-bottom: 10px;
+    }
+    .form-group {
+        display: inline-block;
+        margin: 0 10px;
+    }
+    .form-group label {
+        display: inline;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    .form-group input {
+        border: none;
+        background: transparent;
+        font-size: 12px;
+        width: auto;
+    }
+    .tables-div {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    .table-section {
+        padding: 0;
+        margin-bottom: 0;
+    }
+
+    /* Match the PDF: This Week on the left, Ambleside Readings on the right */
+    .table-section:nth-child(1) {
+        flex: 0 0 62%;
+        order: 2;
+    }
+    .table-section:nth-child(2) {
+        flex: 0 0 38%;
+        order: 1;
+    }
+    .table-section h3 {
+        text-align: center;
+        margin: 0 0 5px;
+        font-size: 10px;
+        font-weight: bold;
+    }
+    .readings-table {
+        width: 100%;
+        font-size: 8px;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    .subjects-table {
+        width: 100%;
+        font-size: 8px;
+        border-collapse: collapse;
+        margin: 0;
+        table-layout: fixed;
+    }
+    .readings-table th, .readings-table td, .subjects-table th, .subjects-table td {
+        border: 1px solid #000;
+        padding: 4px;
+        text-align: left;
+    }
+
+    /* Keep row heights consistent so both tables align vertically */
+    .readings-table th, .readings-table td {
+        height: 14px;
+        padding: 3px;
+    }
+    .subjects-table th, .subjects-table td {
+        height: 14px;
+        padding: 3px;
+    }
+    .readings-table th, .subjects-table th {
+        background: #f0f0f0;
+        font-weight: bold;
+    }
+
+    .readings-table th:nth-child(2),
+    .readings-table td:nth-child(2) {
+        width: 18px;
+        text-align: center;
+    }
+    .readings-table td input[type="checkbox"] {
+        transform: scale(0.8);
+    }
+    .subjects-table td input[type="text"] {
+        border: none;
+        background: transparent;
+        font-size: 8px;
+        width: 100%;
+    }
+    .day-button {
+        width: 100%;
+        height: 12px;
+        border: 1px solid #000;
+        background: none;
+    }
+    .subjects-table td.highlighted {
+        background-color: yellow !important;
+    }
+    .notes-section {
+        clear: both;
+        margin-top: 10px;
+    }
+    .notes-section h3 {
+        font-size: 10px;
+        margin-bottom: 5px;
+    }
+    .notes-textarea {
+        border: 1px solid #000;
+        background: transparent;
+        resize: none;
+        height: 60px;
+        font-size: 8px;
+        width: 100%;
+    }
+}

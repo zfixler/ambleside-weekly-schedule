@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambleside Weekly Schedule</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div id="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="tab1">Form 1</button>
+            <button id="add-tab">+</button>
+        </div>
+        <div class="tab-content">
+            <div id="tab1" class="tab-pane active">
+                <div class="form-container">
+                    <h1>Ambleside Weekly Schedule</h1>
+                    <form class="weekly-form">
+                        <div class="form-group">
+                            <label for="year-1">Year:</label>
+                            <input type="number" id="year-1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="week-1">Week:</label>
+                            <input type="number" id="week-1" min="1" max="36" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-name-1">Student Name:</label>
+                            <input type="text" id="student-name-1" required>
+                        </div>
+                        <button type="button" class="load-readings">Load Readings</button>
+                        <div class="readings-container"></div>
+                        <button type="button" class="print-form">Print Form</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="src/script.js"></script>
+</body>
+</html>
