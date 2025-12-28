@@ -1,3 +1,5 @@
+import readingLibraryData from '../assets/readingLibrary.json';
+
 let readingLibrary = {};
 let tabCounter = 1;
 let activeTab = 'tab1';
@@ -73,12 +75,8 @@ function removeTabListEntry(storageKey) {
 }
 
 async function loadReadingLibrary() {
-    try {
-        const response = await fetch('../assets/readingLibrary.json');
-        readingLibrary = await response.json();
-    } catch (error) {
-        console.error('Error loading reading library:', error);
-    }
+    // Bundle the library into the build so dist/index.html works when opened directly (file://)
+    readingLibrary = readingLibraryData;
 }
 
 function getReadings(year, week) {
@@ -445,16 +443,16 @@ function createTab(options = {}) {
             <h1>Ambleside Weekly Reading Form</h1>
             <form class="weekly-form">
                 <div class="form-group">
+                    <label for="student-name-${num}">Student Name:</label>
+                    <input type="text" id="student-name-${num}" required>
+                </div>
+                <div class="form-group">
                     <label for="year-${num}">Year:</label>
                     <input type="number" id="year-${num}" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="week-${num}">Week:</label>
                     <input type="number" id="week-${num}" min="1" max="36" required>
-                </div>
-                <div class="form-group">
-                    <label for="student-name-${num}">Student Name:</label>
-                    <input type="text" id="student-name-${num}" required>
                 </div>
                 <button type="button" class="load-readings">Load Readings</button>
                 <div class="readings-container"></div>

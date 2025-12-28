@@ -18,16 +18,16 @@
                     <h1>Ambleside Weekly Schedule</h1>
                     <form class="weekly-form">
                         <div class="form-group">
+                            <div class="form-group">
+                                <label for="student-name-1">Student Name:</label>
+                                <input type="text" id="student-name-1" required>
+                            </div>
                             <label for="year-1">Year:</label>
                             <input type="number" id="year-1" min="1" required>
                         </div>
                         <div class="form-group">
                             <label for="week-1">Week:</label>
                             <input type="number" id="week-1" min="1" max="36" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="student-name-1">Student Name:</label>
-                            <input type="text" id="student-name-1" required>
                         </div>
                         <button type="button" class="load-readings">Load Readings</button>
                         <div class="readings-container"></div>
@@ -37,6 +37,6 @@
             </div>
         </div>
     </div>
-    <script src="src/script.js"></script>
+    <script type="module" src="/src/script.js"></script>
 </body>
 </html>
