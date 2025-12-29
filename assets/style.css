@@ -292,6 +292,12 @@ button:hover {
 
 /* Print styles */
 @media print {
+    /* Ensure print output uses a legible, consistent font size.
+       Browsers may otherwise auto-scale content down to fit the page. */
+    html {
+        font-size: 12pt;
+    }
+
     * {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -300,13 +306,15 @@ button:hover {
     body {
         margin: 0;
         background: white;
-        font-size: 10px;
+        font-size: 12pt;
+        line-height: 1.25;
     }
+
     #tabs, .tab-buttons, .tab-content {
         box-shadow: none;
         border: none;
         max-width: none;
-        padding: 10px;
+        padding: 6px;
     }
     button, #add-tab {
         display: none;
@@ -324,9 +332,24 @@ button:hover {
         display: block !important;
         margin-bottom: 10px;
     }
+
+    /* Keep Student / Year / Week on one line in print */
+    .weekly-form {
+        display: block;
+    }
+
+    .weekly-form > .form-group {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-items: baseline;
+        gap: 12px;
+        vertical-align: baseline;
+    }
+
     .form-group {
-        display: inline-block;
-        margin: 0 10px;
+        margin: 0;
+        white-space: nowrap;
+        min-width: 0;
     }
     .form-group label {
         display: inline;
@@ -336,13 +359,15 @@ button:hover {
     .form-group input {
         border: none;
         background: transparent;
-        font-size: 12px;
         width: auto;
+        padding: 0;
+        margin: 0;
+        min-width: 0;
     }
     .tables-div {
         display: flex;
         width: 100%;
-        gap: 10px;
+        gap: 6px;
         align-items: flex-start;
     }
     .table-section {
@@ -352,30 +377,30 @@ button:hover {
 
     /* Match the PDF: This Week on the left, Ambleside Readings on the right */
     .table-section:nth-child(1) {
-        flex: 0 0 62%;
+        flex: 0 0 65%;
         order: 2;
     }
     .table-section:nth-child(2) {
-        flex: 0 0 38%;
+        flex: 0 0 35%;
         order: 1;
     }
     .table-section h3 {
         text-align: center;
         margin: 0 0 5px;
-        font-size: 10px;
         font-weight: bold;
     }
     .readings-table {
         width: 100%;
-        font-size: 8px;
         margin: 0;
+        border-collapse: collapse;
+        border-spacing: 0;
     }
     .subjects-table {
         width: 100%;
-        font-size: 8px;
         border-collapse: collapse;
         margin: 0;
         table-layout: fixed;
+        border-spacing: 0;
     }
     .readings-table th, .readings-table td, .subjects-table th, .subjects-table td {
         border: 1px solid #000;
@@ -385,7 +410,7 @@ button:hover {
 
     /* Reading rows: keep them as tight as possible in print */
     .readings-table th, .readings-table td {
-        padding: 2px;
+        padding: 5px;
         vertical-align: top;
     }
 
@@ -396,13 +421,16 @@ button:hover {
         margin: 0;
         padding: 0;
         border: 0;
+        font: inherit;
         line-height: 1.1;
     }
 
     /* Keep subjects compact and consistent */
     .subjects-table th, .subjects-table td {
-        height: 14px;
-        padding: 3px;
+        height: 18px;
+        padding: 6px;
+        line-height: 1.1;
+        vertical-align: top;
     }
 
     .readings-table th, .subjects-table th {
@@ -419,14 +447,40 @@ button:hover {
     .subjects-table td input[type="text"] {
         border: none;
         background: transparent;
-        font-size: 8px;
         width: 100%;
+        font: inherit;
+        padding: 0;
+        margin: 0;
+        display: block;
+        line-height: 1;
+        height: 18px;
+        box-sizing: border-box;
+    }
+
+    /* The subjects table lives in a narrower column; give the Subject name more room. */
+    .subjects-table th:nth-child(1),
+    .subjects-table td:nth-child(1) {
+        width: 52%;
+    }
+    .subjects-table th:nth-child(n+2),
+    .subjects-table td:nth-child(n+2) {
+        width: 9.6%;
+    }
+
+    /* Tables often end up looking smaller than the surrounding text; keep them readable. */
+    .readings-table, .subjects-table {
+        font-size: 11pt;
     }
     .day-button {
         width: 100%;
-        height: 12px;
-        border: 1px solid #000;
+        height: 18px;
+        border: 0;
         background: none;
+        padding: 0;
+        margin: 0;
+        display: block;
+        line-height: 1;
+        box-sizing: border-box;
     }
     .subjects-table td.highlighted {
         background-color: yellow !important;
@@ -436,7 +490,6 @@ button:hover {
         margin-top: 10px;
     }
     .notes-section h3 {
-        font-size: 10px;
         margin-bottom: 5px;
     }
     .notes-textarea {
@@ -444,7 +497,11 @@ button:hover {
         background: transparent;
         margin-bottom: 10px;
         resize: none;
-        font-size: 8px;
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        /* Keep notes from running off the page in print */
+        max-height: 2.2in;
+        overflow: hidden;
     }
 }

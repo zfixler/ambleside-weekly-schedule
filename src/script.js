@@ -113,8 +113,28 @@ function getReadings(year, week) {
 
 function autoSizeTextarea(textarea) {
     if (!textarea) return;
+    // Reset first, then set to scrollHeight. Add a small buffer to avoid
+    // sub-pixel rounding causing the last line to be clipped (common in print).
     textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    textarea.style.overflow = 'hidden';
+    const extra = 2;
+    textarea.style.height = `${textarea.scrollHeight + extra}px`;
+}
+
+function autoSizeTextareasInContainer(container) {
+    if (!container) return;
+    container.querySelectorAll('textarea').forEach(t => autoSizeTextarea(t));
+}
+
+function autoSizeTextareasInTab(tabId) {
+    const pane = document.getElementById(tabId);
+    if (!pane) return;
+    autoSizeTextareasInContainer(pane);
+}
+
+function autoSizeTextareasInActiveTab() {
+    const pane = document.querySelector('.tab-pane.active') || document.getElementById('tab1');
+    autoSizeTextareasInContainer(pane);
 }
 
 function populateReadings(readings, tabId) {
@@ -376,11 +396,25 @@ function loadTab(tabId) {
 }
 
 function switchTab(tabId) {
+    // When changing tabs, persist the current tab and restore the target tab
+    // so readings/notes/subjects show up immediately.
+    if (activeTab && activeTab !== tabId) {
+        try {
+            persistTab(activeTab, { silent: true });
+        } catch {
+            // Best-effort: do not block switching if something is missing.
+        }
+    }
+
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
     document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
     document.getElementById(tabId).classList.add('active');
     activeTab = tabId;
+
+    // Restore saved UI state for the newly active tab (including readings table).
+    loadTab(tabId);
+    autoSizeTextareasInTab(tabId);
 }
 
 function rebuildTabButton(tabId, title, storageKey) {
@@ -513,7 +547,12 @@ function createTab(options = {}) {
 
     tabPane.querySelector('.print-form').addEventListener('click', () => {
         persistTab(tabId, { silent: true });
-        window.print();
+        autoSizeTextareasInTab(tabId);
+        // Run once more on the next frame to ensure layout has settled.
+        requestAnimationFrame(() => {
+            autoSizeTextareasInTab(tabId);
+            window.print();
+        });
     });
 
     updateTabListEntry(storageKey, title);
@@ -597,7 +636,11 @@ async function init() {
         });
         document.querySelector('#tab1 .print-form')?.addEventListener('click', () => {
             persistTab('tab1', { silent: true });
-            window.print();
+            autoSizeTextareasInTab('tab1');
+            requestAnimationFrame(() => {
+                autoSizeTextareasInTab('tab1');
+                window.print();
+            });
         });
         btn?.addEventListener('click', () => switchTab(tabId));
 
@@ -608,3 +651,21 @@ async function init() {
 }
 
 init();
+
+// When print media rules apply, textarea wrapping can change; re-measure heights.
+window.addEventListener('beforeprint', () => {
+    autoSizeTextareasInActiveTab();
+});
+
+// Some browsers are more reliable with matchMedia("print") than beforeprint.
+const printMediaQuery = window.matchMedia?.('print');
+if (printMediaQuery?.addEventListener) {
+    printMediaQuery.addEventListener('change', (e) => {
+        if (e.matches) autoSizeTextareasInActiveTab();
+    });
+} else if (printMediaQuery?.addListener) {
+    // Deprecated, but still used in older browsers.
+    printMediaQuery.addListener((mql) => {
+        if (mql.matches) autoSizeTextareasInActiveTab();
+    });
+}
