@@ -58,6 +58,29 @@ function getTabTitle(tabId) {
     return getTabButton(tabId)?.dataset.title || '';
 }
 
+function getDefaultTabTitle(tabId) {
+    const num = Number(String(tabId || '').replace('tab', ''));
+    return Number.isFinite(num) && num > 0 ? `Form ${num}` : 'Form';
+}
+
+function syncTabTitleFromStudentName(tabId, { persist = false } = {}) {
+    const btn = getTabButton(tabId);
+    if (!btn) return;
+
+    const num = String(tabId || '').replace('tab', '');
+    const studentName = (document.getElementById(`student-name-${num}`)?.value || '').trim();
+    const storageKey = getTabStorageKey(tabId);
+    if (!storageKey) return;
+
+    const nextTitle = studentName || getDefaultTabTitle(tabId);
+    if (nextTitle !== getTabTitle(tabId)) {
+        rebuildTabButton(tabId, nextTitle, storageKey);
+        updateTabListEntry(storageKey, nextTitle);
+    }
+
+    if (persist) persistTab(tabId, { silent: true });
+}
+
 function updateTabListEntry(storageKey, title) {
     const tabs = getTabList();
     const idx = tabs.findIndex(t => t.storageKey === storageKey);
@@ -121,6 +144,8 @@ function populateReadings(readings, tabId) {
 
         const readingCell = document.createElement('td');
         const readingTextarea = document.createElement('textarea');
+        // Default HTML textarea height is ~2 rows; set to 1 so short readings don't waste space.
+        readingTextarea.rows = 1;
         readingTextarea.value = String(reading ?? '');
         readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
         readingCell.appendChild(readingTextarea);
@@ -312,6 +337,8 @@ function loadTab(tabId) {
     document.getElementById(`week-${num}`).value = parsed.week || '';
     document.getElementById(`student-name-${num}`).value = parsed.studentName || '';
 
+    syncTabTitleFromStudentName(tabId);
+
     if (parsed.year && parsed.week) {
         const readings = getReadings(parsed.year, parsed.week);
         populateReadings(readings, tabId);
@@ -440,7 +467,7 @@ function createTab(options = {}) {
     tabPane.className = 'tab-pane';
     tabPane.innerHTML = `
         <div class="form-container">
-            <h1>Ambleside Weekly Reading Form</h1>
+            <h1>Ambleside Weekly Schedule</h1>
             <form class="weekly-form">
                 <div class="form-group">
                     <label for="student-name-${num}">Student Name:</label>
@@ -463,6 +490,13 @@ function createTab(options = {}) {
     document.querySelector('.tab-content').appendChild(tabPane);
 
     // Add event listeners
+    tabPane.querySelector(`#student-name-${num}`)?.addEventListener('input', () => {
+        syncTabTitleFromStudentName(tabId);
+    });
+    tabPane.querySelector(`#student-name-${num}`)?.addEventListener('change', () => {
+        syncTabTitleFromStudentName(tabId, { persist: true });
+    });
+
     tabPane.querySelector('.load-readings').addEventListener('click', () => {
         const year = document.getElementById(`year-${num}`).value;
         const week = document.getElementById(`week-${num}`).value;
@@ -484,6 +518,9 @@ function createTab(options = {}) {
 
     updateTabListEntry(storageKey, title);
     loadTab(tabId);
+
+    // If the new tab has a student name already loaded from storage, reflect it.
+    syncTabTitleFromStudentName(tabId);
 
     switchTab(tabId);
 }
@@ -538,6 +575,13 @@ async function init() {
         }
         updateTabListEntry(storageKey, title);
 
+        document.getElementById('student-name-1')?.addEventListener('input', () => {
+            syncTabTitleFromStudentName(tabId);
+        });
+        document.getElementById('student-name-1')?.addEventListener('change', () => {
+            syncTabTitleFromStudentName(tabId, { persist: true });
+        });
+
         document.querySelector('#tab1 .load-readings')?.addEventListener('click', () => {
             const year = document.getElementById('year-1').value;
             const week = document.getElementById('week-1').value;
@@ -558,6 +602,8 @@ async function init() {
         btn?.addEventListener('click', () => switchTab(tabId));
 
         loadTab(tabId);
+
+        syncTabTitleFromStudentName(tabId);
     }
 }
 

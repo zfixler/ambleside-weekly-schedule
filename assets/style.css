@@ -203,10 +203,6 @@ button:hover {
     text-align: center;
 }
 
-.readings-table td input[type="checkbox"] {
-    transform: scale(1.2);
-}
-
 .readings-table td textarea {
     width: 100%;
     border: none;
@@ -290,6 +286,10 @@ button:hover {
     background-color: yellow;
 }
 
+.print-form {
+    margin-top: 10px;
+}
+
 /* Print styles */
 @media print {
     * {
@@ -368,7 +368,6 @@ button:hover {
     .readings-table {
         width: 100%;
         font-size: 8px;
-        border-collapse: collapse;
         margin: 0;
     }
     .subjects-table {
@@ -384,15 +383,28 @@ button:hover {
         text-align: left;
     }
 
-    /* Keep row heights consistent so both tables align vertically */
+    /* Reading rows: keep them as tight as possible in print */
     .readings-table th, .readings-table td {
-        height: 14px;
-        padding: 3px;
+        padding: 2px;
+        vertical-align: top;
     }
+
+    .readings-table td textarea {
+        /* textarea is inline-block by default; block removes baseline gap */
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        line-height: 1.1;
+    }
+
+    /* Keep subjects compact and consistent */
     .subjects-table th, .subjects-table td {
         height: 14px;
         padding: 3px;
     }
+
     .readings-table th, .subjects-table th {
         background: #f0f0f0;
         font-weight: bold;
@@ -403,9 +415,7 @@ button:hover {
         width: 18px;
         text-align: center;
     }
-    .readings-table td input[type="checkbox"] {
-        transform: scale(0.8);
-    }
+
     .subjects-table td input[type="text"] {
         border: none;
         background: transparent;
@@ -432,8 +442,8 @@ button:hover {
     .notes-textarea {
         border: 1px solid #000;
         background: transparent;
+        margin-bottom: 10px;
         resize: none;
-        height: 60px;
         font-size: 8px;
         width: 100%;
     }
