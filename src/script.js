@@ -137,10 +137,22 @@ function autoSizeTextareasInActiveTab() {
     autoSizeTextareasInContainer(pane);
 }
 
-function populateReadings(readings, tabId) {
+function populateReadings(year, week, tabId) {
     const container = document.querySelector(`#${tabId} .readings-container`);
     container.innerHTML = '';
-    if (!readings) {
+
+    const defaultReadings = getReadings(year, week) || [];
+    const storageKey = getTabStorageKey(tabId);
+    const data = localStorage.getItem(`${TAB_DATA_PREFIX}${storageKey}`);
+    const parsed = data ? JSON.parse(data) : {};
+    const isSameWeek = parsed.year == year && parsed.week == week;
+    const removed = isSameWeek ? (parsed.removedIndices || []) : [];
+    const keptIndices = defaultReadings.map((_, i) => i).filter(i => !removed.includes(i));
+    const keptDefault = keptIndices.map(i => defaultReadings[i]);
+    const custom = parsed.customReadings || [];
+    const allReadings = [...keptDefault, ...custom];
+
+    if (!allReadings.length) {
         container.innerHTML = '<p>No readings found for this year and week.</p>';
         return;
     }
@@ -159,24 +171,106 @@ function populateReadings(readings, tabId) {
         </tbody>
     `;
     const readingsTbody = readingsTable.querySelector('tbody');
-    readings.forEach((reading) => {
+    allReadings.forEach((reading, i) => {
         const row = document.createElement('tr');
 
+        if (i < keptDefault.length) {
+            row.dataset.type = 'default';
+            row.dataset.index = keptIndices[i];
+        } else {
+            row.dataset.type = 'custom';
+        }
+
         const readingCell = document.createElement('td');
+        const readingContainer = document.createElement('div');
+        readingContainer.style.display = 'flex';
+        readingContainer.style.alignItems = 'flex-start';
+        readingContainer.style.justifyContent = 'space-between';
+        readingContainer.style.width = '100%';
         const readingTextarea = document.createElement('textarea');
         // Default HTML textarea height is ~2 rows; set to 1 so short readings don't waste space.
         readingTextarea.rows = 1;
         readingTextarea.value = String(reading ?? '');
+        readingTextarea.style.flex = '1';
         readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
-        readingCell.appendChild(readingTextarea);
+        readingContainer.appendChild(readingTextarea);
         // Initial size after being added to the DOM; queue for next tick.
         queueMicrotask(() => autoSizeTextarea(readingTextarea));
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-row';
+        removeBtn.style.background = 'none';
+        removeBtn.style.border = 'none';
+        removeBtn.style.color = 'red';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.padding = '0';
+        removeBtn.style.marginLeft = '15px';
+        removeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+        removeBtn.addEventListener('click', () => {
+            row.remove();
+            persistTab(tabId, { silent: true });
+        });
+        readingContainer.appendChild(removeBtn);
+        readingCell.appendChild(readingContainer);
 
         const completedCell = document.createElement('td');
 
         row.appendChild(readingCell);
         row.appendChild(completedCell);
         readingsTbody.appendChild(row);
+    });
+
+    // Add row button
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'add-row';
+    addBtn.textContent = 'Add Row';
+    addBtn.style.alignSelf = 'flex-start';
+
+    addBtn.addEventListener('click', () => {
+        const tbody = readingsTable.querySelector('tbody');
+        const row = document.createElement('tr');
+        row.dataset.type = 'custom';
+
+        const readingCell = document.createElement('td');
+        const readingContainer = document.createElement('div');
+        readingContainer.style.display = 'flex';
+        readingContainer.style.alignItems = 'flex-start';
+        readingContainer.style.justifyContent = 'space-between';
+        readingContainer.style.width = '100%';
+        const readingTextarea = document.createElement('textarea');
+        readingTextarea.rows = 1;
+        readingTextarea.value = '';
+        readingTextarea.style.flex = '1';
+        readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
+        readingTextarea.addEventListener('input', () => persistTab(tabId, { silent: true }));
+        readingContainer.appendChild(readingTextarea);
+        queueMicrotask(() => autoSizeTextarea(readingTextarea));
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-row';
+        removeBtn.style.background = 'none';
+        removeBtn.style.border = 'none';
+        removeBtn.style.color = 'red';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.padding = '0';
+        removeBtn.style.marginLeft = '5px';
+        removeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+        removeBtn.addEventListener('click', () => {
+            row.remove();
+            persistTab(tabId, { silent: true });
+        });
+        readingContainer.appendChild(removeBtn);
+        readingCell.appendChild(readingContainer);
+
+        const completedCell = document.createElement('td');
+
+        row.appendChild(readingCell);
+        row.appendChild(completedCell);
+        tbody.appendChild(row);
+        persistTab(tabId, { silent: true });
     });
 
     // Single notes textarea
@@ -225,6 +319,7 @@ function populateReadings(readings, tabId) {
     readingsTitle.textContent = 'Ambleside Readings';
     readingsSection.appendChild(readingsTitle);
     readingsSection.appendChild(readingsTable);
+    readingsSection.appendChild(addBtn);
     tablesDiv.appendChild(readingsSection);
 
     // Subjects section
@@ -249,7 +344,7 @@ function populateReadings(readings, tabId) {
     // Persist reading edits without requiring explicit Save
     document.querySelectorAll(`#${tabId} .readings-table tbody textarea`).forEach(textarea => {
         autoSizeTextarea(textarea);
-        textarea.addEventListener('change', () => persistTab(tabId, { silent: true }));
+        textarea.addEventListener('input', () => persistTab(tabId, { silent: true }));
     });
 }
 
@@ -315,14 +410,23 @@ function persistTab(tabId, { silent = false } = {}) {
         year,
         week,
         studentName,
-        readings: [],
         subjects: [],
-        notes: document.querySelector(`#${tabId} .notes-textarea`)?.value || ''
+        notes: document.querySelector(`#${tabId} .notes-textarea`)?.value || '',
+        removedIndices: [],
+        customReadings: []
     };
 
-    document.querySelectorAll(`#${tabId} .readings-table tbody tr`).forEach(tr => {
+    const defaultReadings = getReadings(year, week) || [];
+    const allIndices = Array.from({length: defaultReadings.length}, (_, i) => i);
+    const currentDefaultIndices = [];
+    document.querySelectorAll(`#${tabId} .readings-table tbody tr[data-type="default"]`).forEach(tr => {
+        currentDefaultIndices.push(parseInt(tr.dataset.index));
+    });
+    data.removedIndices = allIndices.filter(i => !currentDefaultIndices.includes(i));
+
+    document.querySelectorAll(`#${tabId} .readings-table tbody tr[data-type="custom"]`).forEach(tr => {
         const textarea = tr.querySelector('textarea');
-        data.readings.push(textarea?.value || '');
+        data.customReadings.push(textarea?.value || '');
     });
 
     document.querySelectorAll(`#${tabId} .subjects-table tbody tr`).forEach(tr => {
@@ -360,20 +464,10 @@ function loadTab(tabId) {
     syncTabTitleFromStudentName(tabId);
 
     if (parsed.year && parsed.week) {
-        const readings = getReadings(parsed.year, parsed.week);
-        populateReadings(readings, tabId);
+        populateReadings(parsed.year, parsed.week, tabId);
     }
 
     setTimeout(() => {
-        if (Array.isArray(parsed.readings)) {
-            const textareas = document.querySelectorAll(`#${tabId} .readings-table tbody textarea`);
-            parsed.readings.forEach((val, idx) => {
-                if (textareas[idx]) {
-                    textareas[idx].value = val || '';
-                    autoSizeTextarea(textareas[idx]);
-                }
-            });
-        }
 
         const notesEl = document.querySelector(`#${tabId} .notes-textarea`);
         if (notesEl) notesEl.value = parsed.notes || '';
@@ -626,8 +720,7 @@ async function init() {
             const week = document.getElementById('week-1').value;
             if (year && week) {
                 const state = captureTabState(tabId);
-                const readings = getReadings(year, week);
-                populateReadings(readings, tabId);
+                populateReadings(year, week, tabId);
                 applyTabState(tabId, state);
                 persistTab(tabId, { silent: true });
             } else {
@@ -648,6 +741,26 @@ async function init() {
 
         syncTabTitleFromStudentName(tabId);
     }
+
+    // Add load-readings listeners for all tabs
+    document.querySelectorAll('.load-readings').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const pane = btn.closest('.tab-pane');
+            if (!pane) return;
+            const tabId = pane.id;
+            const num = tabId.replace('tab', '');
+            const year = document.getElementById(`year-${num}`).value;
+            const week = document.getElementById(`week-${num}`).value;
+            if (year && week) {
+                const state = captureTabState(tabId);
+                populateReadings(year, week, tabId);
+                applyTabState(tabId, state);
+                persistTab(tabId, { silent: true });
+            } else {
+                alert('Please enter year and week.');
+            }
+        });
+    });
 }
 
 init();
