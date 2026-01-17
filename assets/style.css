@@ -305,17 +305,19 @@ label {
 .readings-table td:nth-child(2) {
     width: 48px;
     text-align: center;
+    display: none; /* Hide in normal view */
 }
 
 .readings-table td textarea {
     width: 100%;
     border: none;
     background: none;
-    padding: var(--space-xs) 0;
+    padding: var(--space-xs) var(--space-xs);
     margin: 0;
     box-sizing: border-box;
-    font: inherit;
-    color: inherit;
+    font-family: var(--font-family);
+    font-size: 14px;
+    color: var(--color-text);
     text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -482,6 +484,9 @@ label {
     border-radius: var(--radius-sm);
     transition: all 0.2s ease;
     opacity: 0.6;
+    flex-shrink: 0;
+    width: auto;
+    min-width: 24px;
 }
 
 .remove-row:hover {
@@ -503,7 +508,9 @@ label {
 }
 
 .reading-row-container textarea {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-basis: 0;
 }
 
 /* ============================================
@@ -513,18 +520,23 @@ label {
     * {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        box-sizing: border-box;
     }
 
     html {
-        font-size: 11pt;
+        font-size: 10pt;
     }
 
     body {
         margin: 0;
         padding: 0;
         background: white;
-        font-size: 11pt;
-        line-height: 1.2;
+        font-size: 10pt;
+        line-height: 1.3;
+        color: #1f2937;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     /* Hide non-print elements */
@@ -550,79 +562,103 @@ label {
         box-shadow: none;
         border: none;
         max-width: none;
-        padding: 4px;
+        width: 100%;
+        padding: 8px 12px;
     }
 
     .form-container {
         display: block !important;
-        margin-bottom: 6px;
+        margin-bottom: 0;
+        width: 100%;
+        max-width: 100%;
     }
 
     /* Form header layout */
     .weekly-form {
         display: block;
+        width: 100%;
+        max-width: 100%;
     }
 
     .weekly-form > .form-group {
         display: inline-flex;
-        flex-wrap: nowrap;
         align-items: baseline;
-        gap: 10px;
-        vertical-align: baseline;
+        gap: 6px;
+        margin: 0 24px 10px 0;
     }
 
     .form-group {
         margin: 0;
         white-space: nowrap;
-        min-width: 0;
     }
 
     .form-group label {
         display: inline;
-        font-weight: bold;
-        margin-right: 4px;
-        font-size: 10pt;
+        font-weight: 600;
+        margin: 0;
+        font-size: 9pt;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
     }
 
     .form-group input {
         border: none;
+        border-bottom: 1pt solid #d1d5db;
         background: transparent;
         width: auto;
-        padding: 0;
+        min-width: 60px;
+        padding: 0 0 2px 0;
         margin: 0;
-        min-width: 0;
         font-size: 10pt;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    /* Container for positioning */
+    .readings-container {
+        position: relative;
+        margin-top: 10px;
+        width: 100%;
+        max-width: 100%;
     }
 
     /* Tables side by side */
     .tables-div {
         display: flex;
         width: 100%;
-        gap: 5px;
+        max-width: 100%;
+        gap: 12px;
         align-items: flex-start;
+        margin: 0;
+        padding: 0;
     }
 
     .table-section {
         padding: 0;
-        margin-bottom: 0;
+        margin: 0;
     }
 
     .table-section h3 {
         text-align: center;
-        margin: 0 0 4px;
-        font-weight: bold;
-        font-size: 11pt;
+        margin: 0 0 6px;
+        font-weight: 700;
+        font-size: 10.5pt;
+        color: #1f2937;
+        text-transform: none;
+        letter-spacing: 0;
     }
 
-    /* Readings on right (65%), Subjects on left (35%) */
-    .table-section:nth-child(1) {
-        flex: 0 0 65%;
-        order: 2;
-    }
-
+    /* Subjects on left (42%) */
     .table-section:nth-child(2) {
-        flex: 0 0 35%;
+        flex: 0 0 42%;
         order: 1;
+    }
+
+    /* Readings on right (58%) */
+    .table-section:nth-child(1) {
+        flex: 0 0 58%;
+        order: 2;
     }
 
     /* Readings table print */
@@ -631,39 +667,55 @@ label {
         margin: 0;
         border-collapse: collapse;
         border-spacing: 0;
-        font-size: 10pt;
-        border: 1px solid #000;
+        font-size: 9pt;
+        border: 1.5pt solid #374151;
         border-radius: 0;
     }
 
     .readings-table th,
     .readings-table td {
-        border: 1px solid #000;
-        padding: 3px;
+        border: 1pt solid #9ca3af;
+        padding: 4px 5px;
         text-align: left;
         vertical-align: top;
     }
 
     .readings-table th {
-        background: #f5f5f5;
-        font-weight: bold;
-        font-size: 9pt;
+        background: #f3f4f6;
+        font-weight: 700;
+        font-size: 8.5pt;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
+        padding: 5px;
     }
 
     .readings-table th:nth-child(2),
     .readings-table td:nth-child(2) {
-        width: 16px;
+        display: table-cell; /* Show in print view */
+        width: 20px;
         text-align: center;
+        background: #fafafa;
+    }
+
+    .readings-table tbody tr:nth-child(even) {
+        background-color: #fafbfc;
+    }
+
+    .readings-table tbody tr:nth-child(even) td:nth-child(2) {
+        background-color: #f5f5f5;
     }
 
     .readings-table td textarea {
         display: block;
         width: 100%;
         margin: 0;
-        padding: 2px 0;
+        padding: 1px 0;
         border: 0;
-        font: inherit;
-        line-height: 1.3;
+        font-family: var(--font-family);
+        font-size: 9pt;
+        line-height: 1.35;
+        color: #1f2937;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: anywhere;
@@ -678,43 +730,49 @@ label {
         margin: 0;
         table-layout: fixed;
         border-spacing: 0;
-        font-size: 10pt;
-        border: 1px solid #000;
+        font-size: 9pt;
+        border: 1.5pt solid #374151;
         border-radius: 0;
     }
 
     .subjects-table th,
     .subjects-table td {
-        border: 1px solid #000;
+        border: 1pt solid #9ca3af;
         min-height: 16px;
         padding: 3px;
-        line-height: 1.3;
-        vertical-align: top;
+        line-height: 1.25;
+        vertical-align: middle;
     }
 
     .subjects-table th {
-        background: #f5f5f5;
-        font-weight: bold;
-        font-size: 9pt;
+        background: #f3f4f6;
+        font-weight: 700;
+        font-size: 8pt;
+        color: #374151;
+        padding: 4px 3px;
     }
 
     .subjects-table th:nth-child(1),
     .subjects-table td:nth-child(1) {
-        width: 52%;
+        width: 50%;
+        padding-left: 5px;
     }
 
     .subjects-table th:nth-child(n+2),
     .subjects-table td:nth-child(n+2) {
-        width: 9.6%;
+        width: 10%;
         text-align: center;
+        font-weight: 600;
     }
 
     .subjects-table td input[type="text"] {
         border: none;
         background: transparent;
         width: 100%;
-        font: inherit;
-        padding: 2px 0;
+        font-family: var(--font-family);
+        font-size: 8.5pt;
+        color: #1f2937;
+        padding: 0;
         margin: 0;
         display: block;
         line-height: 1.3;
@@ -728,6 +786,7 @@ label {
 
     .subjects-table td.highlighted {
         background-color: #fef3c7 !important;
+        font-weight: 700;
     }
 
     .day-button {
@@ -743,30 +802,38 @@ label {
         box-sizing: border-box;
     }
 
-    /* Notes print */
+    /* Notes print - positioned in right column below readings */
     .notes-section {
-        clear: both;
-        margin-top: 8px;
+        width: 58%;
+        margin-left: calc(42% + 12px);
+        margin-top: 12px;
+        box-sizing: border-box;
     }
 
     .notes-section h3 {
-        margin-bottom: 4px;
-        font-size: 10pt;
+        margin-bottom: 5px;
+        font-size: 9.5pt;
+        font-weight: 700;
+        color: #374151;
+        text-align: left;
     }
 
     .notes-textarea {
-        border: 1px solid #000;
-        background: transparent;
-        margin-bottom: 8px;
+        border: 1pt solid #d1d5db;
+        border-radius: 3pt;
+        background: #fafbfc;
+        margin-bottom: 0;
         resize: none;
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        max-height: 2in;
+        max-height: 1in;
+        min-height: 0.6in;
         overflow: hidden;
-        padding: 4px;
-        font-size: 9pt;
-        line-height: 1.2;
+        padding: 6px;
+        font-size: 8.5pt;
+        line-height: 1.4;
+        color: #1f2937;
     }
 
     /* Reading row container print */
@@ -774,15 +841,17 @@ label {
         display: block;
     }
 
-    /* Readings container spacing */
-    .readings-container {
-        margin-top: 8px;
-    }
 
-    /* Reduce h1 margins for print */
+    /* Title styling for print */
     h1 {
-        margin: 0 0 6px 0;
-        font-size: 14pt;
+        margin: 0 0 12px 0;
+        font-size: 16pt;
+        font-weight: 700;
+        color: #111827;
+        letter-spacing: -0.4pt;
+        text-align: center;
+        padding-bottom: 6px;
+        border-bottom: 2pt solid #10b981;
     }
 
     /* Page break control - keep everything on one page */
@@ -805,5 +874,340 @@ label {
 
     .notes-section {
         page-break-before: avoid;
+    }
+}
+
+/* ============================================
+   MOBILE STYLES
+   ============================================ */
+@media screen and (max-width: 768px) {
+    /* Reduce padding and spacing */
+    body {
+        padding: var(--space-md);
+    }
+
+    h1 {
+        font-size: 22px;
+        margin-bottom: var(--space-md);
+    }
+
+    /* Tab buttons - scrollable horizontal */
+    .tab-buttons {
+        padding: var(--space-sm) var(--space-sm) 0 var(--space-sm);
+        gap: var(--space-xs);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-buttons .tab-button {
+        padding: var(--space-sm) var(--space-md);
+        font-size: 13px;
+        min-width: fit-content;
+    }
+
+    .tab-buttons #add-tab {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 18px;
+        margin-left: var(--space-sm);
+    }
+
+    /* Tab content - reduce padding */
+    .tab-content {
+        padding: var(--space-lg);
+    }
+
+    /* Form elements */
+    input,
+    button {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    button {
+        padding: var(--space-md) var(--space-lg);
+        margin-right: var(--space-sm);
+        margin-bottom: var(--space-sm);
+    }
+
+    label {
+        font-size: 12px;
+    }
+
+    .form-group {
+        margin-bottom: var(--space-md);
+    }
+
+    /* Readings table - stack on mobile */
+    .readings-table {
+        font-size: 14px;
+        width: 100%;
+        max-width: 100%;
+        table-layout: auto;
+    }
+
+    .readings-table th,
+    .readings-table td {
+        padding: var(--space-sm);
+        overflow: visible;
+    }
+
+    .readings-table th {
+        font-size: 12px;
+    }
+
+    .readings-table td {
+        max-width: none;
+    }
+
+    .readings-table th:nth-child(1),
+    .readings-table td:nth-child(1) {
+        width: 100%;
+    }
+
+    .readings-table td textarea {
+        font-size: 14px !important;
+        min-height: 2em;
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: visible !important;
+        color: var(--color-text) !important;
+    }
+
+    .reading-row-container {
+        display: flex !important;
+        width: 100%;
+        max-width: 100%;
+        gap: var(--space-sm);
+        overflow: visible;
+    }
+
+    .reading-row-container textarea {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 100%;
+        flex-basis: 0;
+    }
+
+    .remove-row {
+        padding: var(--space-sm);
+        margin-left: var(--space-sm);
+        margin-right: 0;
+        flex-shrink: 0;
+        width: 32px;
+        max-width: 32px;
+        min-width: 32px;
+    }
+
+    .add-row {
+        font-size: 14px;
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    /* Subjects table - responsive layout */
+    .subjects-table {
+        font-size: 13px;
+    }
+
+    .subjects-table th,
+    .subjects-table td {
+        padding: var(--space-sm);
+    }
+
+    .subjects-table th {
+        font-size: 11px;
+    }
+
+    /* Adjust subject name column for mobile */
+    .subjects-table th:nth-child(1),
+    .subjects-table td:nth-child(1) {
+        width: 35%;
+    }
+
+    /* Day columns - smaller on mobile */
+    .subjects-table th:nth-child(n+2),
+    .subjects-table td:nth-child(n+2) {
+        width: 13%;
+        font-size: 12px;
+    }
+
+    .subjects-table td input[type="text"] {
+        font-size: 14px;
+    }
+
+    .day-button {
+        height: 28px;
+        font-size: 16px;
+    }
+
+    /* Notes section */
+    .notes-section h3 {
+        font-size: 15px;
+    }
+
+    .notes-textarea {
+        font-size: 14px;
+        height: 100px;
+        padding: var(--space-sm);
+    }
+
+    /* Tables layout - stack vertically on mobile */
+    .tables-div {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+    }
+
+    .table-section {
+        width: 100%;
+        margin-bottom: var(--space-lg);
+    }
+
+    .table-section h3 {
+        font-size: 16px;
+        margin-bottom: var(--space-md);
+    }
+
+    /* Reduce container margins */
+    .readings-container {
+        margin-top: var(--space-lg);
+    }
+}
+
+/* Extra small mobile devices */
+@media screen and (max-width: 480px) {
+    body {
+        padding: var(--space-sm);
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .tab-content {
+        padding: var(--space-md);
+    }
+
+    .tab-buttons .tab-button {
+        padding: var(--space-sm) var(--space-sm);
+        font-size: 12px;
+    }
+
+    /* Further reduce table padding */
+    .readings-table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: auto;
+    }
+
+    .readings-table th,
+    .readings-table td {
+        padding: var(--space-xs) var(--space-sm);
+        overflow: visible;
+    }
+
+    .readings-table th:nth-child(1),
+    .readings-table td:nth-child(1) {
+        width: 100%;
+    }
+
+    .readings-table td textarea {
+        font-size: 13px !important;
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: visible !important;
+        color: var(--color-text) !important;
+    }
+
+    .reading-row-container {
+        display: flex !important;
+        width: 100%;
+        max-width: 100%;
+        overflow: visible;
+    }
+
+    .reading-row-container textarea {
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-basis: 0;
+    }
+
+    .remove-row {
+        padding: var(--space-xs);
+        margin-left: var(--space-xs);
+        margin-right: 0;
+        flex-shrink: 0;
+        width: 28px;
+        max-width: 28px;
+        min-width: 28px;
+    }
+
+    .subjects-table th,
+    .subjects-table td {
+        padding: var(--space-xs) var(--space-sm);
+    }
+
+    /* Make subject name column narrower */
+    .subjects-table th:nth-child(1),
+    .subjects-table td:nth-child(1) {
+        width: 30%;
+        font-size: 12px;
+    }
+
+    .subjects-table th:nth-child(n+2),
+    .subjects-table td:nth-child(n+2) {
+        width: 14%;
+        font-size: 11px;
+    }
+
+    .day-button {
+        height: 24px;
+        font-size: 14px;
+    }
+
+    .table-section h3 {
+        font-size: 15px;
+    }
+
+    /* Buttons take full width on very small screens */
+    button {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .print-form {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    /* Reduce vertical spacing in landscape */
+    .tab-content {
+        padding: var(--space-md) var(--space-lg);
+    }
+
+    .form-group {
+        margin-bottom: var(--space-sm);
+    }
+
+    .table-section {
+        margin-bottom: var(--space-md);
+    }
+
+    /* Keep tables side by side in landscape if there's room */
+    .tables-div {
+        flex-direction: row;
+        gap: var(--space-md);
+    }
+
+    .table-section:nth-child(1) {
+        flex: 1;
+    }
+
+    .table-section:nth-child(2) {
+        flex: 1;
     }
 }

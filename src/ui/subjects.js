@@ -2,10 +2,10 @@
  * Creates the subjects table UI.
  * @param {string} tabId
  * @param {Function} persistFn - Function to call when data changes
- * @param {number} rowCount - Number of subject rows (default 18)
+ * @param {number} rowCount - Number of subject rows (default 24)
  * @returns {HTMLTableElement}
  */
-export function createSubjectsTable(tabId, persistFn, rowCount = 18) {
+export function createSubjectsTable(tabId, persistFn, rowCount = 24) {
     const subjectsTable = document.createElement('table');
     subjectsTable.className = 'subjects-table';
     subjectsTable.innerHTML = `
@@ -89,7 +89,7 @@ export function captureSubjectsState(pane) {
 export function applySubjectsState(pane, subjects) {
     if (!Array.isArray(subjects)) return;
 
-    subjects.slice(0, 18).forEach((subj, index) => {
+    subjects.forEach((subj, index) => {
         const tr = pane.querySelector(`.subjects-table tbody tr:nth-child(${index + 1})`);
         if (!tr) return;
 
