@@ -21,6 +21,7 @@ import { createReadingsTable, createNotesSection } from './ui/readings.js';
 import { createSubjectsTable, setupSubjectsListeners, applySubjectsState } from './ui/subjects.js';
 import { createTabPaneStructure, clearTabUi } from './ui/tabs.js';
 import { setupPrintHandlers } from './ui/print.js';
+import readingLibraryData from '../assets/readingLibrary.json';
 
 // Application state
 let readingLibrary = {};
@@ -98,21 +99,9 @@ function removeTabListEntry(storageKey) {
 /**
  * Loads the reading library JSON.
  */
-async function loadReadingLibrary() {
-    try {
-        console.log('Loading reading library...');
-        const response = await fetch('./assets/readingLibrary.json');
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const text = await response.text();
-        readingLibrary = JSON.parse(text);
-    } catch (error) {
-        console.error('Failed to load reading library:', error);
-        readingLibrary = {};
-    }
+function loadReadingLibrary() {
+    console.log('Loading reading library...');
+    readingLibrary = readingLibraryData;
 }
 
 /**
@@ -585,7 +574,7 @@ async function init() {
         storage = new LocalStorageBackend();
     }
 
-    await loadReadingLibrary();
+    loadReadingLibrary();
 
     document.getElementById('add-tab').addEventListener('click', () => createTab());
 
