@@ -126,7 +126,7 @@ export function createNotesSection(tabId, persistFn) {
     notesDiv.className = 'notes-section';
     notesDiv.innerHTML = `
         <h3>Notes</h3>
-        <textarea class="notes-textarea" placeholder="Enter notes here"></textarea>
+        <textarea class="notes-textarea"></textarea>
     `;
 
     const notesTextarea = notesDiv.querySelector('.notes-textarea');

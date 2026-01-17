@@ -524,19 +524,23 @@ label {
     }
 
     html {
-        font-size: 10pt;
+        font-size: 9pt;
+        height: 100%;
     }
 
     body {
         margin: 0;
-        padding: 0;
+        padding: 3px 4px;
         background: white;
-        font-size: 10pt;
-        line-height: 1.3;
+        font-size: 9pt;
+        line-height: 1;
         color: #1f2937;
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     /* Hide non-print elements */
@@ -579,17 +583,19 @@ label {
         display: block;
         width: 100%;
         max-width: 100%;
+        flex-shrink: 0;
     }
 
     .weekly-form > .form-group {
         display: inline-flex;
         align-items: baseline;
-        gap: 6px;
-        margin: 0 24px 10px 0;
+        gap: 2px;
+        margin: 0 8px 1px 0;
     }
 
     .form-group {
         margin: 0;
+        margin-top: 2rem;
         white-space: nowrap;
     }
 
@@ -597,21 +603,21 @@ label {
         display: inline;
         font-weight: 600;
         margin: 0;
-        font-size: 9pt;
+        font-size: 8pt;
         color: #6b7280;
         text-transform: uppercase;
-        letter-spacing: 0.3pt;
+        letter-spacing: 0.1pt;
     }
 
     .form-group input {
         border: none;
-        border-bottom: 1pt solid #d1d5db;
+        border-bottom: 0.5pt solid #d1d5db;
         background: transparent;
         width: auto;
-        min-width: 60px;
-        padding: 0 0 2px 0;
+        min-width: 40px;
+        padding: 0;
         margin: 0;
-        font-size: 10pt;
+        font-size: 9pt;
         font-weight: 600;
         color: #111827;
     }
@@ -619,9 +625,14 @@ label {
     /* Container for positioning */
     .readings-container {
         position: relative;
-        margin-top: 10px;
+        margin-top: 2rem;
         width: 100%;
         max-width: 100%;
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
     /* Tables side by side */
@@ -629,36 +640,44 @@ label {
         display: flex;
         width: 100%;
         max-width: 100%;
-        gap: 12px;
-        align-items: flex-start;
+        gap: 1rem;
+        align-items: stretch;
         margin: 0;
         padding: 0;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
     }
 
     .table-section {
         padding: 0;
         margin: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
     .table-section h3 {
         text-align: center;
-        margin: 0 0 6px;
+        margin: 0 0 1rem;
         font-weight: 700;
-        font-size: 10.5pt;
+        font-size: 10pt;
         color: #1f2937;
         text-transform: none;
         letter-spacing: 0;
+        flex-shrink: 0;
     }
 
-    /* Subjects on left (42%) */
+    /* Subjects on left (35%) */
     .table-section:nth-child(2) {
-        flex: 0 0 42%;
+        flex: 0 0 32%;
         order: 1;
     }
 
-    /* Readings on right (58%) */
+    /* Readings on right (65%) */
     .table-section:nth-child(1) {
-        flex: 0 0 58%;
+        flex: 0 0 63%;
         order: 2;
     }
 
@@ -668,35 +687,40 @@ label {
         margin: 0;
         border-collapse: collapse;
         border-spacing: 0;
-        font-size: 9pt;
-        border: 1.5pt solid #374151;
+        font-size: 8pt;
+        border: 1pt solid #374151;
         border-radius: 0;
+        flex: 1;
+        min-height: 0;
     }
 
     .readings-table th,
     .readings-table td {
         border: 1pt solid #9ca3af;
-        padding: 4px 5px;
+        padding: 2px 3px;
         text-align: left;
         vertical-align: top;
+        height: auto;
     }
 
     .readings-table th {
         background: #f3f4f6;
         font-weight: 700;
-        font-size: 8.5pt;
+        font-size: 7pt;
         color: #374151;
         text-transform: uppercase;
-        letter-spacing: 0.3pt;
-        padding: 5px;
+        letter-spacing: 0.1pt;
+        padding: 2px 3px;
+        flex-shrink: 0;
     }
 
     .readings-table th:nth-child(2),
     .readings-table td:nth-child(2) {
         display: table-cell; /* Show in print view */
-        width: 20px;
+        width: 16px;
         text-align: center;
         background: #fafafa;
+        padding: 2px 1px;
     }
 
     .readings-table tbody tr:nth-child(even) {
@@ -711,17 +735,17 @@ label {
         display: block;
         width: 100%;
         margin: 0;
-        padding: 1px 0;
+        padding: 0;
         border: 0;
         font-family: var(--font-family);
-        font-size: 9pt;
-        line-height: 1.35;
+        font-size: 8pt;
+        line-height: 1.2;
         color: #1f2937;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: anywhere;
-        overflow: visible;
         height: auto !important;
+        min-height: 12px;
     }
 
     /* Subjects table print */
@@ -731,37 +755,42 @@ label {
         margin: 0;
         table-layout: fixed;
         border-spacing: 0;
-        font-size: 9pt;
-        border: 1.5pt solid #374151;
+        font-size: 8pt;
+        border: 1pt solid #374151;
         border-radius: 0;
+        overflow: hidden;
+        flex: 1;
+        min-height: 0;
     }
 
     .subjects-table th,
     .subjects-table td {
         border: 1pt solid #9ca3af;
-        min-height: 16px;
-        padding: 3px;
-        line-height: 1.25;
-        vertical-align: middle;
+        min-height: 13px;
+        padding: 2px;
+        line-height: 1.1;
+        vertical-align: top;
+        height: auto;
     }
 
     .subjects-table th {
         background: #f3f4f6;
         font-weight: 700;
-        font-size: 8pt;
+        font-size: 7pt;
         color: #374151;
-        padding: 4px 3px;
+        padding: 2px;
+        flex-shrink: 0;
     }
 
     .subjects-table th:nth-child(1),
     .subjects-table td:nth-child(1) {
-        width: 50%;
-        padding-left: 5px;
+        width: 55%;
+        padding-left: 3px;
     }
 
     .subjects-table th:nth-child(n+2),
     .subjects-table td:nth-child(n+2) {
-        width: 10%;
+        width: 9%;
         text-align: center;
         font-weight: 600;
     }
@@ -771,13 +800,13 @@ label {
         background: transparent;
         width: 100%;
         font-family: var(--font-family);
-        font-size: 8.5pt;
+        font-size: 8pt;
         color: #1f2937;
         padding: 0;
         margin: 0;
         display: block;
-        line-height: 1.3;
-        min-height: 16px;
+        line-height: 1.15;
+        min-height: 13px;
         height: auto;
         box-sizing: border-box;
         white-space: pre-wrap;
@@ -803,38 +832,44 @@ label {
         box-sizing: border-box;
     }
 
-    /* Notes print - positioned in right column below readings */
+    /* Notes print - positioned in left column below subjects */
     .notes-section {
-        width: 58%;
-        margin-left: calc(42% + 12px);
-        margin-top: 12px;
+        width: 35%;
+        margin-left: 0;
+        margin-top: 1rem;
         box-sizing: border-box;
+        flex-shrink: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .notes-section h3 {
-        margin-bottom: 5px;
-        font-size: 9.5pt;
-        font-weight: 700;
-        color: #374151;
+        margin: 0 0 2px 0;
+        font-size: 8pt;
+        font-weight: 600;
+        color: #1f2937;
         text-align: left;
+        flex-shrink: 0;
     }
 
     .notes-textarea {
-        border: 1pt solid #d1d5db;
-        border-radius: 3pt;
-        background: #fafbfc;
+        border: none;
+        border-radius: 0;
+        background: transparent;
         margin-bottom: 0;
         resize: none;
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        max-height: 1in;
-        min-height: 0.6in;
-        overflow: hidden;
-        padding: 6px;
-        font-size: 8.5pt;
-        line-height: 1.4;
+        overflow: visible;
+        padding: 0;
+        font-size: 8pt;
+        line-height: 1.3;
         color: #1f2937;
+        flex-shrink: 0;
+        min-height: auto;
+        max-height: none;
     }
 
     /* Reading row container print */
@@ -845,36 +880,21 @@ label {
 
     /* Title styling for print */
     h1 {
-        margin: 0 0 12px 0;
-        font-size: 16pt;
+        margin: 0 0 2px 0;
+        font-size: 14pt;
         font-weight: 700;
         color: #111827;
-        letter-spacing: -0.4pt;
+        letter-spacing: -0.2pt;
         text-align: center;
-        padding-bottom: 6px;
-        border-bottom: 2pt solid #10b981;
+        padding-bottom: 1px;
+        border-bottom: 1pt solid #10b981;
+        flex-shrink: 0;
     }
 
-    /* Page break control - keep everything on one page */
+    /* Keep everything on one page */
     .form-container {
         page-break-inside: avoid;
-    }
-
-    .weekly-form {
-        page-break-inside: avoid;
-    }
-
-    .readings-container {
-        page-break-before: avoid;
-    }
-
-    .tables-div {
-        page-break-before: avoid;
-        page-break-inside: avoid;
-    }
-
-    .notes-section {
-        page-break-before: avoid;
+        size: letter portrait;
     }
 }
 
