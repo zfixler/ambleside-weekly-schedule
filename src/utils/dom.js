@@ -22,11 +22,11 @@ export function slugifyTitle(title) {
  */
 export function autoSizeTextarea(textarea) {
     if (!textarea) return;
-    // Reset first, then set to scrollHeight. Add a small buffer to avoid
+    // Reset first, then set to scrollHeight. Add a buffer to avoid
     // sub-pixel rounding causing the last line to be clipped (common in print).
     textarea.style.height = 'auto';
-    textarea.style.overflow = 'hidden';
-    const extra = 2;
+    textarea.style.overflow = 'visible';
+    const extra = 4;
     textarea.style.height = `${textarea.scrollHeight + extra}px`;
 }
 

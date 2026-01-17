@@ -5,36 +5,44 @@
    ============================================ */
 :root {
     /* Colors */
-    --color-primary: #4CAF50;
-    --color-primary-hover: #45a049;
-    --color-text: #333;
-    --color-text-muted: #555;
-    --color-text-light: #666;
-    --color-border: #ddd;
-    --color-border-dark: #ccc;
-    --color-bg: #f9f9f9;
-    --color-bg-white: #fff;
-    --color-bg-light: #f5f5f5;
-    --color-bg-header: #f2f2f2;
-    --color-highlight: yellow;
+    --color-primary: #10b981;
+    --color-primary-hover: #059669;
+    --color-primary-light: #d1fae5;
+    --color-text: #1f2937;
+    --color-text-muted: #6b7280;
+    --color-text-light: #9ca3af;
+    --color-border: #e5e7eb;
+    --color-border-dark: #d1d5db;
+    --color-bg: #f9fafb;
+    --color-bg-white: #ffffff;
+    --color-bg-light: #f3f4f6;
+    --color-bg-header: #f9fafb;
+    --color-highlight: #fef3c7;
+    --color-highlight-border: #fbbf24;
+    --color-danger: #ef4444;
+    --color-danger-hover: #dc2626;
 
     /* Spacing */
     --space-xs: 4px;
-    --space-sm: 6px;
-    --space-md: 10px;
-    --space-lg: 15px;
-    --space-xl: 20px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --space-2xl: 32px;
 
     /* Border Radius */
     --radius-sm: 4px;
-    --radius-md: 6px;
-    --radius-lg: 8px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
 
     /* Shadows */
-    --shadow-card: 0 0 10px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
     /* Typography */
-    --font-family: Arial, sans-serif;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* ============================================
@@ -42,13 +50,20 @@
    ============================================ */
 body {
     font-family: var(--font-family);
-    margin: var(--space-xl);
-    background-color: var(--color-bg);
+    margin: 0;
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, #f0fdf4 0%, #f9fafb 100%);
+    min-height: 100vh;
+    color: var(--color-text);
 }
 
 h1 {
     text-align: center;
     color: var(--color-text);
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 var(--space-lg) 0;
+    letter-spacing: -0.5px;
 }
 
 /* ============================================
@@ -56,30 +71,52 @@ h1 {
    ============================================ */
 input {
     width: 100%;
-    padding: 8px;
+    padding: var(--space-sm) var(--space-md);
     box-sizing: border-box;
     border: 1px solid var(--color-border-dark);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: var(--color-bg-white);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 button {
     background-color: var(--color-primary);
     color: white;
-    padding: var(--space-md) var(--space-lg);
+    padding: var(--space-sm) var(--space-lg);
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     cursor: pointer;
     margin-right: var(--space-md);
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 button:hover {
     background-color: var(--color-primary-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: var(--space-xs);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    letter-spacing: 0.3px;
 }
 
 .form-group {
@@ -87,7 +124,7 @@ label {
 }
 
 .form-container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -95,18 +132,17 @@ label {
    Tabs Container
    ============================================ */
 #tabs {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     background: var(--color-bg-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
 }
 
 .tab-content {
     background: white;
-    padding: var(--space-xl);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-    box-shadow: none;
+    padding: var(--space-2xl);
 }
 
 .tab-pane {
@@ -123,11 +159,11 @@ label {
 .tab-buttons {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-sm) 0 var(--space-sm);
-    background: var(--color-bg-white);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    gap: var(--space-xs);
+    padding: var(--space-md) var(--space-md) 0 var(--space-md);
+    background: var(--color-bg-light);
     overflow-x: auto;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .tab-buttons .tab-button {
@@ -135,25 +171,29 @@ label {
     align-items: center;
     white-space: nowrap;
     gap: var(--space-sm);
-    background: var(--color-bg-light);
-    color: #222;
-    border: 1px solid var(--color-border);
-    border-bottom: none;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    padding: 8px 12px;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: var(--space-md) var(--space-lg);
     margin: 0;
     cursor: pointer;
-    font-weight: normal;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .tab-buttons .tab-button:hover {
-    background: #eee;
+    background: var(--color-bg-white);
+    color: var(--color-text);
 }
 
 .tab-buttons .tab-button.active {
     background: var(--color-bg-white);
-    font-weight: 700;
-    box-shadow: inset 0 -2px 0 var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+    border-bottom-color: var(--color-primary);
 }
 
 .tab-buttons .tab-button span,
@@ -162,24 +202,33 @@ label {
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
+    transition: color 0.2s ease;
+    opacity: 0.6;
 }
 
 .tab-buttons .tab-button:hover span,
 .tab-buttons .tab-button:hover .tab-close {
-    color: #111;
+    opacity: 1;
+    color: var(--color-danger);
 }
 
 .tab-buttons #add-tab {
     flex: 0 0 auto;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin-left: auto;
     border-radius: var(--radius-md);
-    line-height: 32px;
+    line-height: 36px;
     background: var(--color-primary);
     color: white;
     border: none;
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.tab-buttons #add-tab:hover {
+    transform: scale(1.05);
 }
 
 /* ============================================
@@ -196,15 +245,18 @@ label {
 .table-section {
     width: 100%;
     padding: 0;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
     display: flex;
     flex-direction: column;
 }
 
 .table-section h3 {
     text-align: center;
-    margin-bottom: var(--space-md);
-    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+    color: var(--color-text);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
 }
 
 /* ============================================
@@ -212,26 +264,46 @@ label {
    ============================================ */
 .readings-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: var(--space-xl);
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: var(--space-lg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
 }
 
 .readings-table th,
 .readings-table td {
-    border: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     padding: var(--space-md);
     text-align: left;
 }
 
+.readings-table tr:last-child td {
+    border-bottom: none;
+}
+
 .readings-table th {
-    background-color: var(--color-bg-header);
-    font-weight: bold;
+    background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+}
+
+.readings-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.readings-table tbody tr:hover {
+    background-color: var(--color-bg-light);
 }
 
 /* Completed column - narrow for checkmark */
 .readings-table th:nth-child(2),
 .readings-table td:nth-child(2) {
-    width: 36px;
+    width: 48px;
     text-align: center;
 }
 
@@ -239,16 +311,19 @@ label {
     width: 100%;
     border: none;
     background: none;
-    padding: 0;
+    padding: var(--space-xs) 0;
     margin: 0;
     box-sizing: border-box;
     font: inherit;
     color: inherit;
     text-align: left;
     white-space: pre-wrap;
+    word-wrap: break-word;
     overflow-wrap: anywhere;
     resize: none;
-    overflow: hidden;
+    overflow: visible;
+    min-height: 2.5em;
+    line-height: 1.5;
 }
 
 /* ============================================
@@ -256,20 +331,46 @@ label {
    ============================================ */
 .subjects-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     table-layout: fixed;
-    margin-top: var(--space-xl);
+    margin-top: var(--space-lg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
 }
 
 .subjects-table th,
 .subjects-table td {
-    border: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
     padding: var(--space-md);
 }
 
+.subjects-table th:last-child,
+.subjects-table td:last-child {
+    border-right: none;
+}
+
+.subjects-table tr:last-child td {
+    border-bottom: none;
+}
+
 .subjects-table th {
-    background-color: var(--color-bg-header);
-    font-weight: bold;
+    background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+}
+
+.subjects-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.subjects-table tbody tr:hover {
+    background-color: var(--color-bg-light);
 }
 
 /* Subject name column */
@@ -282,76 +383,112 @@ label {
 .subjects-table th:nth-child(n+2),
 .subjects-table td:nth-child(n+2) {
     width: 12%;
+    text-align: center;
 }
 
 .subjects-table td input[type="text"] {
     width: 100%;
     border: none;
+    background: transparent;
+    padding: var(--space-xs) 0;
+    min-height: 2em;
+    line-height: 1.4;
+}
+
+.subjects-table td input[type="text"]:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .subjects-table td.highlighted {
-    background-color: var(--color-highlight);
+    background-color: var(--color-highlight) !important;
+    border-color: var(--color-highlight-border);
 }
 
 .day-button {
     width: 100%;
-    height: 30px;
+    height: 32px;
     border: none;
     background: none;
     cursor: pointer;
     padding: 0;
     margin: 0;
+    box-shadow: none;
+}
+
+.day-button:hover {
+    background-color: #fff;
+    box-shadow: none;
+
 }
 
 /* ============================================
    Notes Section
    ============================================ */
 .notes-section {
-    margin-top: var(--space-xl);
+    margin-top: var(--space-2xl);
 }
 
 .notes-section h3 {
     margin-bottom: var(--space-md);
-    color: var(--color-text-muted);
+    color: var(--color-text);
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .notes-textarea {
     width: 100%;
-    height: 100px;
-    padding: 8px;
+    height: 120px;
+    padding: var(--space-md);
     border: 1px solid var(--color-border-dark);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     resize: vertical;
     box-sizing: border-box;
+    font-family: var(--font-family);
+    font-size: 14px;
+    line-height: 1.6;
+    transition: all 0.2s ease;
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 /* ============================================
    Action Buttons
    ============================================ */
 .print-form {
-    margin-top: var(--space-md);
+    margin-top: var(--space-lg);
 }
 
 .add-row {
     align-self: flex-start;
+    font-size: 13px;
 }
 
 .remove-row {
     background: none;
     border: none;
-    color: red;
+    color: var(--color-text-light);
     cursor: pointer;
-    padding: 0;
+    padding: var(--space-xs);
     margin: 0;
-    margin-left: var(--space-lg);
+    margin-left: var(--space-md);
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    opacity: 0.6;
 }
 
 .remove-row:hover {
-    color: darkred;
-    background: none;
+    color: var(--color-danger);
+    background: #fee2e2;
+    opacity: 1;
+    transform: none;
 }
 
 /* ============================================
@@ -362,6 +499,7 @@ label {
     align-items: flex-start;
     justify-content: space-between;
     width: 100%;
+    gap: var(--space-sm);
 }
 
 .reading-row-container textarea {
@@ -378,14 +516,15 @@ label {
     }
 
     html {
-        font-size: 12pt;
+        font-size: 11pt;
     }
 
     body {
         margin: 0;
+        padding: 0;
         background: white;
-        font-size: 12pt;
-        line-height: 1.25;
+        font-size: 11pt;
+        line-height: 1.2;
     }
 
     /* Hide non-print elements */
@@ -411,12 +550,12 @@ label {
         box-shadow: none;
         border: none;
         max-width: none;
-        padding: 6px;
+        padding: 4px;
     }
 
     .form-container {
         display: block !important;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
     /* Form header layout */
@@ -428,7 +567,7 @@ label {
         display: inline-flex;
         flex-wrap: nowrap;
         align-items: baseline;
-        gap: 12px;
+        gap: 10px;
         vertical-align: baseline;
     }
 
@@ -441,7 +580,8 @@ label {
     .form-group label {
         display: inline;
         font-weight: bold;
-        margin-right: 5px;
+        margin-right: 4px;
+        font-size: 10pt;
     }
 
     .form-group input {
@@ -451,13 +591,14 @@ label {
         padding: 0;
         margin: 0;
         min-width: 0;
+        font-size: 10pt;
     }
 
     /* Tables side by side */
     .tables-div {
         display: flex;
         width: 100%;
-        gap: 6px;
+        gap: 5px;
         align-items: flex-start;
     }
 
@@ -468,8 +609,9 @@ label {
 
     .table-section h3 {
         text-align: center;
-        margin: 0 0 5px;
+        margin: 0 0 4px;
         font-weight: bold;
+        font-size: 11pt;
     }
 
     /* Readings on right (65%), Subjects on left (35%) */
@@ -489,25 +631,28 @@ label {
         margin: 0;
         border-collapse: collapse;
         border-spacing: 0;
-        font-size: 11pt;
+        font-size: 10pt;
+        border: 1px solid #000;
+        border-radius: 0;
     }
 
     .readings-table th,
     .readings-table td {
         border: 1px solid #000;
-        padding: 5px;
+        padding: 3px;
         text-align: left;
         vertical-align: top;
     }
 
     .readings-table th {
-        background: #f0f0f0;
+        background: #f5f5f5;
         font-weight: bold;
+        font-size: 9pt;
     }
 
     .readings-table th:nth-child(2),
     .readings-table td:nth-child(2) {
-        width: 18px;
+        width: 16px;
         text-align: center;
     }
 
@@ -515,10 +660,15 @@ label {
         display: block;
         width: 100%;
         margin: 0;
-        padding: 0;
+        padding: 2px 0;
         border: 0;
         font: inherit;
-        line-height: 1.1;
+        line-height: 1.3;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        overflow: visible;
+        height: auto !important;
     }
 
     /* Subjects table print */
@@ -528,21 +678,24 @@ label {
         margin: 0;
         table-layout: fixed;
         border-spacing: 0;
-        font-size: 11pt;
+        font-size: 10pt;
+        border: 1px solid #000;
+        border-radius: 0;
     }
 
     .subjects-table th,
     .subjects-table td {
         border: 1px solid #000;
-        height: 18px;
-        padding: 6px;
-        line-height: 1.1;
+        min-height: 16px;
+        padding: 3px;
+        line-height: 1.3;
         vertical-align: top;
     }
 
     .subjects-table th {
-        background: #f0f0f0;
+        background: #f5f5f5;
         font-weight: bold;
+        font-size: 9pt;
     }
 
     .subjects-table th:nth-child(1),
@@ -553,6 +706,7 @@ label {
     .subjects-table th:nth-child(n+2),
     .subjects-table td:nth-child(n+2) {
         width: 9.6%;
+        text-align: center;
     }
 
     .subjects-table td input[type="text"] {
@@ -560,21 +714,26 @@ label {
         background: transparent;
         width: 100%;
         font: inherit;
-        padding: 0;
+        padding: 2px 0;
         margin: 0;
         display: block;
-        line-height: 1;
-        height: 18px;
+        line-height: 1.3;
+        min-height: 16px;
+        height: auto;
         box-sizing: border-box;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
     }
 
     .subjects-table td.highlighted {
-        background-color: yellow !important;
+        background-color: #fef3c7 !important;
     }
 
     .day-button {
         width: 100%;
-        height: 18px;
+        min-height: 16px;
+        height: 100%;
         border: 0;
         background: none;
         padding: 0;
@@ -587,23 +746,27 @@ label {
     /* Notes print */
     .notes-section {
         clear: both;
-        margin-top: 10px;
+        margin-top: 8px;
     }
 
     .notes-section h3 {
-        margin-bottom: 5px;
+        margin-bottom: 4px;
+        font-size: 10pt;
     }
 
     .notes-textarea {
         border: 1px solid #000;
         background: transparent;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         resize: none;
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        max-height: 2.2in;
+        max-height: 2in;
         overflow: hidden;
+        padding: 4px;
+        font-size: 9pt;
+        line-height: 1.2;
     }
 
     /* Reading row container print */
@@ -613,16 +776,16 @@ label {
 
     /* Readings container spacing */
     .readings-container {
-        margin-top: 10px;
+        margin-top: 8px;
     }
 
     /* Reduce h1 margins for print */
     h1 {
-        margin: 0 0 8px 0;
-        font-size: 16pt;
+        margin: 0 0 6px 0;
+        font-size: 14pt;
     }
 
-    /* Page break control - keep everything together */
+    /* Page break control - keep everything on one page */
     .form-container {
         page-break-inside: avoid;
     }
@@ -638,5 +801,9 @@ label {
     .tables-div {
         page-break-before: avoid;
         page-break-inside: avoid;
+    }
+
+    .notes-section {
+        page-break-before: avoid;
     }
 }

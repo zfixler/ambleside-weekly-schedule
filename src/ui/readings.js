@@ -78,7 +78,6 @@ function createReadingRow({ reading, isDefault, defaultIndex, tabId, persistFn }
     readingContainer.className = 'reading-row-container';
 
     const readingTextarea = document.createElement('textarea');
-    readingTextarea.rows = 1;
     readingTextarea.value = String(reading ?? '');
     readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
     readingTextarea.addEventListener('input', () => persistFn(tabId, { silent: true }));
