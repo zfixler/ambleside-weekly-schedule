@@ -1,21 +1,39 @@
-import readingLibraryData from '../assets/readingLibrary.json';
+/**
+ * Ambleside Weekly Schedule - Main Application
+ *
+ * A single-page web application for generating weekly homeschool reading schedules
+ * based on the Ambleside Online curriculum.
+ */
 
+import { getStorageBackend, LocalStorageBackend, TAB_LIST_KEY, TAB_DATA_PREFIX } from './storage/index.js';
+import { DebounceManager } from './utils/debounce.js';
+import {
+    autoSizeTextarea,
+    autoSizeTextareasInTab,
+    autoSizeTextareasInActiveTab,
+    slugifyTitle,
+    getTabButton,
+    getTabStorageKey,
+    getTabTitle,
+    getDefaultTabTitle
+} from './utils/dom.js';
+import { createReadingsTable, createNotesSection } from './ui/readings.js';
+import { createSubjectsTable, setupSubjectsListeners, applySubjectsState } from './ui/subjects.js';
+import { createTabPaneStructure, clearTabUi } from './ui/tabs.js';
+import { setupPrintHandlers } from './ui/print.js';
+
+// Application state
 let readingLibrary = {};
 let tabCounter = 1;
 let activeTab = 'tab1';
+let storage = null;
 
-const TAB_LIST_KEY = 'ambleside_tabs_v1';
-const TAB_DATA_PREFIX = 'ambleside_tab_v1:';
+// Debounce manager for persistence
+const persistDebounce = new DebounceManager(300);
 
-function slugifyTitle(title) {
-    return String(title || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .slice(0, 40) || 'tab';
-}
-
+/**
+ * Gets the current tab list from localStorage (for backward compatibility during migration).
+ */
 function getTabList() {
     const list = localStorage.getItem(TAB_LIST_KEY);
     if (!list) return [];
@@ -27,14 +45,23 @@ function getTabList() {
     }
 }
 
+/**
+ * Sets the tab list in localStorage.
+ */
 function setTabList(tabs) {
     localStorage.setItem(TAB_LIST_KEY, JSON.stringify(tabs));
 }
 
+/**
+ * Gets all existing storage keys.
+ */
 function getAllStorageKeys() {
     return new Set(getTabList().map(t => t.storageKey).filter(Boolean));
 }
 
+/**
+ * Generates a unique storage key.
+ */
 function uniqueStorageKey(base) {
     const existing = getAllStorageKeys();
     let candidate = base;
@@ -46,23 +73,65 @@ function uniqueStorageKey(base) {
     return candidate;
 }
 
-function getTabButton(tabId) {
-    return document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+/**
+ * Updates a tab list entry.
+ */
+function updateTabListEntry(storageKey, title) {
+    const tabs = getTabList();
+    const idx = tabs.findIndex(t => t.storageKey === storageKey);
+    if (idx >= 0) {
+        tabs[idx] = { ...tabs[idx], title };
+    } else {
+        tabs.push({ title, storageKey });
+    }
+    setTabList(tabs);
 }
 
-function getTabStorageKey(tabId) {
-    return getTabButton(tabId)?.dataset.storageKey || '';
+/**
+ * Removes a tab list entry.
+ */
+function removeTabListEntry(storageKey) {
+    const tabs = getTabList().filter(t => t.storageKey !== storageKey);
+    setTabList(tabs);
 }
 
-function getTabTitle(tabId) {
-    return getTabButton(tabId)?.dataset.title || '';
+/**
+ * Loads the reading library JSON.
+ */
+async function loadReadingLibrary() {
+    try {
+        console.log('Loading reading library...');
+        const response = await fetch('./assets/readingLibrary.json');
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        readingLibrary = JSON.parse(text);
+    } catch (error) {
+        console.error('Failed to load reading library:', error);
+        readingLibrary = {};
+    }
 }
 
-function getDefaultTabTitle(tabId) {
-    const num = Number(String(tabId || '').replace('tab', ''));
-    return Number.isFinite(num) && num > 0 ? `Form ${num}` : 'Form';
+/**
+ * Gets readings for a specific year and week.
+ */
+function getReadings(year, week) {
+    const yearNum = parseInt(year, 10);
+    const weekNum = parseInt(week, 10);
+    const yearKey = `year_${yearNum}`;
+    const weekKey = `week_${weekNum}`;
+    if (readingLibrary[yearKey] && readingLibrary[yearKey][weekKey]) {
+        return readingLibrary[yearKey][weekKey];
+    }
+    return null;
 }
 
+/**
+ * Syncs the tab title from the student name input.
+ */
 function syncTabTitleFromStudentName(tabId, { persist = false } = {}) {
     const btn = getTabButton(tabId);
     if (!btn) return;
@@ -81,71 +150,22 @@ function syncTabTitleFromStudentName(tabId, { persist = false } = {}) {
     if (persist) persistTab(tabId, { silent: true });
 }
 
-function updateTabListEntry(storageKey, title) {
-    const tabs = getTabList();
-    const idx = tabs.findIndex(t => t.storageKey === storageKey);
-    if (idx >= 0) {
-        tabs[idx] = { ...tabs[idx], title };
-    } else {
-        tabs.push({ title, storageKey });
-    }
-    setTabList(tabs);
-}
-
-function removeTabListEntry(storageKey) {
-    const tabs = getTabList().filter(t => t.storageKey !== storageKey);
-    setTabList(tabs);
-}
-
-async function loadReadingLibrary() {
-    // Bundle the library into the build so dist/index.html works when opened directly (file://)
-    readingLibrary = readingLibraryData;
-}
-
-function getReadings(year, week) {
-    const yearKey = `year_${year}`;
-    const weekKey = `week_${week}`;
-    if (readingLibrary[yearKey] && readingLibrary[yearKey][weekKey]) {
-        return readingLibrary[yearKey][weekKey];
-    }
-    return null;
-}
-
-function autoSizeTextarea(textarea) {
-    if (!textarea) return;
-    // Reset first, then set to scrollHeight. Add a small buffer to avoid
-    // sub-pixel rounding causing the last line to be clipped (common in print).
-    textarea.style.height = 'auto';
-    textarea.style.overflow = 'hidden';
-    const extra = 2;
-    textarea.style.height = `${textarea.scrollHeight + extra}px`;
-}
-
-function autoSizeTextareasInContainer(container) {
-    if (!container) return;
-    container.querySelectorAll('textarea').forEach(t => autoSizeTextarea(t));
-}
-
-function autoSizeTextareasInTab(tabId) {
-    const pane = document.getElementById(tabId);
-    if (!pane) return;
-    autoSizeTextareasInContainer(pane);
-}
-
-function autoSizeTextareasInActiveTab() {
-    const pane = document.querySelector('.tab-pane.active') || document.getElementById('tab1');
-    autoSizeTextareasInContainer(pane);
-}
-
+/**
+ * Populates the readings container for a tab.
+ */
 function populateReadings(year, week, tabId) {
     const container = document.querySelector(`#${tabId} .readings-container`);
+    if (!container) {
+        console.error(`Readings container not found for tab ${tabId}`);
+        return;
+    }
     container.innerHTML = '';
 
     const defaultReadings = getReadings(year, week) || [];
     const storageKey = getTabStorageKey(tabId);
     const data = localStorage.getItem(`${TAB_DATA_PREFIX}${storageKey}`);
     const parsed = data ? JSON.parse(data) : {};
-    const isSameWeek = parsed.year == year && parsed.week == week;
+    const isSameWeek = Number(parsed.year) === Number(year) && Number(parsed.week) === Number(week);
     const removed = isSameWeek ? (parsed.removedIndices || []) : [];
     const keptIndices = defaultReadings.map((_, i) => i).filter(i => !removed.includes(i));
     const keptDefault = keptIndices.map(i => defaultReadings[i]);
@@ -157,158 +177,22 @@ function populateReadings(year, week, tabId) {
         return;
     }
 
-    // Readings table
-    const readingsTable = document.createElement('table');
-    readingsTable.className = 'readings-table';
-    readingsTable.innerHTML = `
-        <thead>
-            <tr>
-                <th>Reading</th>
-                <th>Completed</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    `;
-    const readingsTbody = readingsTable.querySelector('tbody');
-    allReadings.forEach((reading, i) => {
-        const row = document.createElement('tr');
-
-        if (i < keptDefault.length) {
-            row.dataset.type = 'default';
-            row.dataset.index = keptIndices[i];
-        } else {
-            row.dataset.type = 'custom';
-        }
-
-        const readingCell = document.createElement('td');
-        const readingContainer = document.createElement('div');
-        readingContainer.style.display = 'flex';
-        readingContainer.style.alignItems = 'flex-start';
-        readingContainer.style.justifyContent = 'space-between';
-        readingContainer.style.width = '100%';
-        const readingTextarea = document.createElement('textarea');
-        // Default HTML textarea height is ~2 rows; set to 1 so short readings don't waste space.
-        readingTextarea.rows = 1;
-        readingTextarea.value = String(reading ?? '');
-        readingTextarea.style.flex = '1';
-        readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
-        readingContainer.appendChild(readingTextarea);
-        // Initial size after being added to the DOM; queue for next tick.
-        queueMicrotask(() => autoSizeTextarea(readingTextarea));
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'remove-row';
-        removeBtn.style.background = 'none';
-        removeBtn.style.border = 'none';
-        removeBtn.style.color = 'red';
-        removeBtn.style.cursor = 'pointer';
-        removeBtn.style.padding = '0';
-        removeBtn.style.marginLeft = '15px';
-        removeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-        removeBtn.addEventListener('click', () => {
-            row.remove();
-            persistTab(tabId, { silent: true });
-        });
-        readingContainer.appendChild(removeBtn);
-        readingCell.appendChild(readingContainer);
-
-        const completedCell = document.createElement('td');
-
-        row.appendChild(readingCell);
-        row.appendChild(completedCell);
-        readingsTbody.appendChild(row);
+    // Create readings table
+    const { readingsTable, addBtn } = createReadingsTable({
+        allReadings,
+        keptIndices,
+        keptDefaultLength: keptDefault.length,
+        tabId,
+        persistFn: persistTab
     });
 
-    // Add row button
-    const addBtn = document.createElement('button');
-    addBtn.type = 'button';
-    addBtn.className = 'add-row';
-    addBtn.textContent = 'Add Row';
-    addBtn.style.alignSelf = 'flex-start';
+    // Create subjects table
+    const subjectsTable = createSubjectsTable(tabId, persistTab);
 
-    addBtn.addEventListener('click', () => {
-        const tbody = readingsTable.querySelector('tbody');
-        const row = document.createElement('tr');
-        row.dataset.type = 'custom';
+    // Create notes section
+    const notesDiv = createNotesSection(tabId, persistTab);
 
-        const readingCell = document.createElement('td');
-        const readingContainer = document.createElement('div');
-        readingContainer.style.display = 'flex';
-        readingContainer.style.alignItems = 'flex-start';
-        readingContainer.style.justifyContent = 'space-between';
-        readingContainer.style.width = '100%';
-        const readingTextarea = document.createElement('textarea');
-        readingTextarea.rows = 1;
-        readingTextarea.value = '';
-        readingTextarea.style.flex = '1';
-        readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
-        readingTextarea.addEventListener('input', () => persistTab(tabId, { silent: true }));
-        readingContainer.appendChild(readingTextarea);
-        queueMicrotask(() => autoSizeTextarea(readingTextarea));
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'remove-row';
-        removeBtn.style.background = 'none';
-        removeBtn.style.border = 'none';
-        removeBtn.style.color = 'red';
-        removeBtn.style.cursor = 'pointer';
-        removeBtn.style.padding = '0';
-        removeBtn.style.marginLeft = '5px';
-        removeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
-        removeBtn.addEventListener('click', () => {
-            row.remove();
-            persistTab(tabId, { silent: true });
-        });
-        readingContainer.appendChild(removeBtn);
-        readingCell.appendChild(readingContainer);
-
-        const completedCell = document.createElement('td');
-
-        row.appendChild(readingCell);
-        row.appendChild(completedCell);
-        tbody.appendChild(row);
-        persistTab(tabId, { silent: true });
-    });
-
-    // Single notes textarea
-    const notesDiv = document.createElement('div');
-    notesDiv.className = 'notes-section';
-    notesDiv.innerHTML = `
-        <h3>Notes</h3>
-        <textarea class="notes-textarea" placeholder="Enter notes here"></textarea>
-    `;
-
-    // Subjects table
-    const subjectsTable = document.createElement('table');
-    subjectsTable.className = 'subjects-table';
-    subjectsTable.innerHTML = `
-        <thead>
-            <tr>
-                <th>Subject</th>
-                <th>M</th>
-                <th>T</th>
-                <th>W</th>
-                <th>Th</th>
-                <th>F</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    `;
-    const subjectsTbody = subjectsTable.querySelector('tbody');
-    const days = ['M', 'T', 'W', 'Th', 'F'];
-    for (let i = 0; i < 18; i++) {  // 18 rows for subjects
-        const row = document.createElement('tr');
-        let rowHtml = `<td><input type="text" /></td>`;
-        days.forEach(day => {
-            rowHtml += `<td><button type="button" class="day-button" data-day="${day}"></button></td>`;
-        });
-        row.innerHTML = rowHtml;
-        subjectsTbody.appendChild(row);
-    }
+    // Build layout
     const tablesDiv = document.createElement('div');
     tablesDiv.className = 'tables-div';
 
@@ -330,24 +214,22 @@ function populateReadings(year, week, tabId) {
     subjectsSection.appendChild(subjectsTitle);
     subjectsSection.appendChild(subjectsTable);
     tablesDiv.appendChild(subjectsSection);
+
     container.appendChild(tablesDiv);
     container.appendChild(notesDiv);
 
-    // Add event listeners for day buttons
-    document.querySelectorAll(`#${tabId} .day-button`).forEach(btn => {
-        btn.addEventListener('click', () => {
-            const cell = btn.closest('td');
-            if (cell) cell.classList.toggle('highlighted');
-        });
-    });
+    // Setup event listeners
+    setupSubjectsListeners(tabId, persistTab);
 
-    // Persist reading edits without requiring explicit Save
+    // Auto-size textareas
     document.querySelectorAll(`#${tabId} .readings-table tbody textarea`).forEach(textarea => {
         autoSizeTextarea(textarea);
-        textarea.addEventListener('input', () => persistTab(tabId, { silent: true }));
     });
 }
 
+/**
+ * Captures the current state of a tab.
+ */
 function captureTabState(tabId) {
     const pane = document.getElementById(tabId);
     if (!pane) return null;
@@ -368,6 +250,9 @@ function captureTabState(tabId) {
     return { notes, subjects };
 }
 
+/**
+ * Applies saved state to a tab.
+ */
 function applyTabState(tabId, state) {
     if (!state) return;
     const pane = document.getElementById(tabId);
@@ -376,23 +261,22 @@ function applyTabState(tabId, state) {
     const notesEl = pane.querySelector('.notes-textarea');
     if (notesEl) notesEl.value = state.notes || '';
 
-    if (Array.isArray(state.subjects)) {
-        state.subjects.slice(0, 18).forEach((subj, index) => {
-            const tr = pane.querySelector(`.subjects-table tbody tr:nth-child(${index + 1})`);
-            if (!tr) return;
-            const input = tr.querySelector('input[type="text"]');
-            if (input) input.value = subj.name || '';
-            tr.querySelectorAll('.day-button').forEach(btn => {
-                const cell = btn.closest('td');
-                if (!cell) return;
-                if (subj.days && subj.days[btn.dataset.day]) cell.classList.add('highlighted');
-                else cell.classList.remove('highlighted');
-            });
-        });
-    }
+    applySubjectsState(pane, state.subjects);
 }
 
+/**
+ * Debounced tab persistence.
+ */
 function persistTab(tabId, { silent = false } = {}) {
+    persistDebounce.schedule(tabId, () => {
+        persistTabImmediately(tabId, { silent });
+    });
+}
+
+/**
+ * Immediately persists tab data to storage.
+ */
+function persistTabImmediately(tabId, { silent = false } = {}) {
     const num = tabId.split('tab')[1];
     const year = document.getElementById(`year-${num}`).value;
     const week = document.getElementById(`week-${num}`).value;
@@ -417,7 +301,7 @@ function persistTab(tabId, { silent = false } = {}) {
     };
 
     const defaultReadings = getReadings(year, week) || [];
-    const allIndices = Array.from({length: defaultReadings.length}, (_, i) => i);
+    const allIndices = Array.from({ length: defaultReadings.length }, (_, i) => i);
     const currentDefaultIndices = [];
     document.querySelectorAll(`#${tabId} .readings-table tbody tr[data-type="default"]`).forEach(tr => {
         currentDefaultIndices.push(parseInt(tr.dataset.index));
@@ -439,14 +323,20 @@ function persistTab(tabId, { silent = false } = {}) {
         data.subjects.push({ name: input?.value || '', days });
     });
 
-    localStorage.setItem(`${TAB_DATA_PREFIX}${storageKey}`, JSON.stringify(data));
-    updateTabListEntry(storageKey, title);
+    try {
+        localStorage.setItem(`${TAB_DATA_PREFIX}${storageKey}`, JSON.stringify(data));
+        updateTabListEntry(storageKey, title);
+    } catch (error) {
+        if (!silent) {
+            alert(`Failed to save data: ${error.message}`);
+        }
+        console.error('Failed to persist tab data:', error);
+    }
 }
 
-function saveForm(tabId) {
-    persistTab(tabId, { silent: true });
-}
-
+/**
+ * Loads saved data into a tab.
+ */
 function loadTab(tabId) {
     const storageKey = getTabStorageKey(tabId);
     if (!storageKey) return;
@@ -467,34 +357,33 @@ function loadTab(tabId) {
         populateReadings(parsed.year, parsed.week, tabId);
     }
 
-    setTimeout(() => {
+    // Apply saved state directly after populateReadings (which is synchronous)
+    const notesEl = document.querySelector(`#${tabId} .notes-textarea`);
+    if (notesEl) notesEl.value = parsed.notes || '';
 
-        const notesEl = document.querySelector(`#${tabId} .notes-textarea`);
-        if (notesEl) notesEl.value = parsed.notes || '';
-
-        if (Array.isArray(parsed.subjects)) {
-            parsed.subjects.forEach((subj, index) => {
-                const tr = document.querySelector(`#${tabId} .subjects-table tbody tr:nth-child(${index + 1})`);
-                if (!tr) return;
-                const input = tr.querySelector('input[type="text"]');
-                if (input) input.value = subj.name || '';
-                tr.querySelectorAll('.day-button').forEach(btn => {
-                    const cell = btn.closest('td');
-                    if (!cell) return;
-                    if (subj.days && subj.days[btn.dataset.day]) cell.classList.add('highlighted');
-                    else cell.classList.remove('highlighted');
-                });
+    if (Array.isArray(parsed.subjects)) {
+        parsed.subjects.forEach((subj, index) => {
+            const tr = document.querySelector(`#${tabId} .subjects-table tbody tr:nth-child(${index + 1})`);
+            if (!tr) return;
+            const input = tr.querySelector('input[type="text"]');
+            if (input) input.value = subj.name || '';
+            tr.querySelectorAll('.day-button').forEach(btn => {
+                const cell = btn.closest('td');
+                if (!cell) return;
+                if (subj.days && subj.days[btn.dataset.day]) cell.classList.add('highlighted');
+                else cell.classList.remove('highlighted');
             });
-        }
-    }, 50);
+        });
+    }
 }
 
+/**
+ * Switches to a different tab.
+ */
 function switchTab(tabId) {
-    // When changing tabs, persist the current tab and restore the target tab
-    // so readings/notes/subjects show up immediately.
     if (activeTab && activeTab !== tabId) {
         try {
-            persistTab(activeTab, { silent: true });
+            persistTabImmediately(activeTab, { silent: true });
         } catch {
             // Best-effort: do not block switching if something is missing.
         }
@@ -506,11 +395,13 @@ function switchTab(tabId) {
     document.getElementById(tabId).classList.add('active');
     activeTab = tabId;
 
-    // Restore saved UI state for the newly active tab (including readings table).
     loadTab(tabId);
     autoSizeTextareasInTab(tabId);
 }
 
+/**
+ * Rebuilds a tab button with updated title.
+ */
 function rebuildTabButton(tabId, title, storageKey) {
     const btn = getTabButton(tabId);
     if (!btn) return;
@@ -529,6 +420,9 @@ function rebuildTabButton(tabId, title, storageKey) {
     btn.appendChild(closeBtn);
 }
 
+/**
+ * Renames a tab.
+ */
 function renameTab(tabId) {
     const btn = getTabButton(tabId);
     if (!btn) return;
@@ -540,7 +434,7 @@ function renameTab(tabId) {
 
     const newStorageKey = uniqueStorageKey(slugifyTitle(nextTitle));
 
-    // migrate data
+    // Migrate data
     if (oldStorageKey) {
         const oldKey = `${TAB_DATA_PREFIX}${oldStorageKey}`;
         const newKey = `${TAB_DATA_PREFIX}${newStorageKey}`;
@@ -556,6 +450,9 @@ function renameTab(tabId) {
     updateTabListEntry(newStorageKey, nextTitle);
 }
 
+/**
+ * Creates a new tab.
+ */
 function createTab(options = {}) {
     tabCounter++;
     const tabId = `tab${tabCounter}`;
@@ -590,59 +487,60 @@ function createTab(options = {}) {
     document.querySelector('.tab-buttons').insertBefore(tabButton, document.getElementById('add-tab'));
 
     // Create tab pane
-    const tabPane = document.createElement('div');
+    const tabPane = createTabPaneStructure(num);
     tabPane.id = tabId;
-    tabPane.className = 'tab-pane';
-    tabPane.innerHTML = `
-        <div class="form-container">
-            <h1>Ambleside Weekly Schedule</h1>
-            <form class="weekly-form">
-                <div class="form-group">
-                    <label for="student-name-${num}">Student Name:</label>
-                    <input type="text" id="student-name-${num}" required>
-                </div>
-                <div class="form-group">
-                    <label for="year-${num}">Year:</label>
-                    <input type="number" id="year-${num}" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="week-${num}">Week:</label>
-                    <input type="number" id="week-${num}" min="1" max="36" required>
-                </div>
-                <button type="button" class="load-readings">Load Readings</button>
-                <div class="readings-container"></div>
-                <button type="button" class="print-form">Print Form</button>
-            </form>
-        </div>
-    `;
     document.querySelector('.tab-content').appendChild(tabPane);
 
+    // Get references to the inputs and buttons
+    const nameInput = document.getElementById(`student-name-${num}`);
+    const yearInput = document.getElementById(`year-${num}`);
+    const weekInput = document.getElementById(`week-${num}`);
+    const loadButton = tabPane.querySelector('.load-readings');
+    const printButton = tabPane.querySelector('.print-form');
+
     // Add event listeners
-    tabPane.querySelector(`#student-name-${num}`)?.addEventListener('input', () => {
+    nameInput.addEventListener('input', () => {
         syncTabTitleFromStudentName(tabId);
     });
-    tabPane.querySelector(`#student-name-${num}`)?.addEventListener('change', () => {
+    nameInput.addEventListener('change', () => {
         syncTabTitleFromStudentName(tabId, { persist: true });
     });
+    yearInput.addEventListener('input', () => {
+        persistTab(tabId, { silent: true });
+    });
+    weekInput.addEventListener('input', () => {
+        persistTab(tabId, { silent: true });
+    });
 
-    tabPane.querySelector('.load-readings').addEventListener('click', () => {
-        const year = document.getElementById(`year-${num}`).value;
-        const week = document.getElementById(`week-${num}`).value;
+    loadButton.addEventListener('click', () => {
+        const year = yearInput.value;
+        const week = weekInput.value;
         if (year && week) {
+            // Clear any saved removedIndices for this year/week when explicitly loading
+            const sk = getTabStorageKey(tabId);
+            if (sk) {
+                const data = localStorage.getItem(`${TAB_DATA_PREFIX}${sk}`);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (Number(parsed.year) === Number(year) && Number(parsed.week) === Number(week)) {
+                        parsed.removedIndices = [];
+                        localStorage.setItem(`${TAB_DATA_PREFIX}${sk}`, JSON.stringify(parsed));
+                    }
+                }
+            }
+
             const state = captureTabState(tabId);
-            const readings = getReadings(year, week);
-            populateReadings(readings, tabId);
+            populateReadings(year, week, tabId);
             applyTabState(tabId, state);
-            persistTab(tabId, { silent: true });
+            persistTabImmediately(tabId, { silent: true });
         } else {
             alert('Please enter year and week.');
         }
     });
 
-    tabPane.querySelector('.print-form').addEventListener('click', () => {
-        persistTab(tabId, { silent: true });
+    printButton.addEventListener('click', () => {
+        persistTabImmediately(tabId, { silent: true });
         autoSizeTextareasInTab(tabId);
-        // Run once more on the next frame to ensure layout has settled.
         requestAnimationFrame(() => {
             autoSizeTextareasInTab(tabId);
             window.print();
@@ -651,13 +549,13 @@ function createTab(options = {}) {
 
     updateTabListEntry(storageKey, title);
     loadTab(tabId);
-
-    // If the new tab has a student name already loaded from storage, reflect it.
     syncTabTitleFromStudentName(tabId);
-
     switchTab(tabId);
 }
 
+/**
+ * Closes a tab.
+ */
 function closeTab(tabId) {
     if (document.querySelectorAll('.tab-button').length > 1) {
         const storageKey = getTabStorageKey(tabId);
@@ -674,12 +572,19 @@ function closeTab(tabId) {
     }
 }
 
-function clearTabUi() {
-    document.querySelectorAll('.tab-pane').forEach(p => p.remove());
-    document.querySelectorAll('.tab-button').forEach(b => b.remove());
-}
-
+/**
+ * Initializes the application.
+ */
 async function init() {
+    // Initialize storage backend (handles migration)
+    try {
+        storage = await getStorageBackend();
+        console.log('Storage backend initialized:', storage.constructor.name);
+    } catch (error) {
+        console.warn('Failed to initialize preferred storage, falling back to localStorage:', error);
+        storage = new LocalStorageBackend();
+    }
+
     await loadReadingLibrary();
 
     document.getElementById('add-tab').addEventListener('click', () => createTab());
@@ -714,6 +619,12 @@ async function init() {
         document.getElementById('student-name-1')?.addEventListener('change', () => {
             syncTabTitleFromStudentName(tabId, { persist: true });
         });
+        document.getElementById('year-1')?.addEventListener('input', () => {
+            persistTab(tabId, { silent: true });
+        });
+        document.getElementById('week-1')?.addEventListener('input', () => {
+            persistTab(tabId, { silent: true });
+        });
 
         document.querySelector('#tab1 .load-readings')?.addEventListener('click', () => {
             const year = document.getElementById('year-1').value;
@@ -722,63 +633,29 @@ async function init() {
                 const state = captureTabState(tabId);
                 populateReadings(year, week, tabId);
                 applyTabState(tabId, state);
-                persistTab(tabId, { silent: true });
+                persistTabImmediately(tabId, { silent: true });
             } else {
                 alert('Please enter year and week.');
             }
         });
+
         document.querySelector('#tab1 .print-form')?.addEventListener('click', () => {
-            persistTab('tab1', { silent: true });
+            persistTabImmediately('tab1', { silent: true });
             autoSizeTextareasInTab('tab1');
             requestAnimationFrame(() => {
                 autoSizeTextareasInTab('tab1');
                 window.print();
             });
         });
+
         btn?.addEventListener('click', () => switchTab(tabId));
-
         loadTab(tabId);
-
         syncTabTitleFromStudentName(tabId);
     }
-
-    // Add load-readings listeners for all tabs
-    document.querySelectorAll('.load-readings').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const pane = btn.closest('.tab-pane');
-            if (!pane) return;
-            const tabId = pane.id;
-            const num = tabId.replace('tab', '');
-            const year = document.getElementById(`year-${num}`).value;
-            const week = document.getElementById(`week-${num}`).value;
-            if (year && week) {
-                const state = captureTabState(tabId);
-                populateReadings(year, week, tabId);
-                applyTabState(tabId, state);
-                persistTab(tabId, { silent: true });
-            } else {
-                alert('Please enter year and week.');
-            }
-        });
-    });
 }
 
+// Initialize the application
 init();
 
-// When print media rules apply, textarea wrapping can change; re-measure heights.
-window.addEventListener('beforeprint', () => {
-    autoSizeTextareasInActiveTab();
-});
-
-// Some browsers are more reliable with matchMedia("print") than beforeprint.
-const printMediaQuery = window.matchMedia?.('print');
-if (printMediaQuery?.addEventListener) {
-    printMediaQuery.addEventListener('change', (e) => {
-        if (e.matches) autoSizeTextareasInActiveTab();
-    });
-} else if (printMediaQuery?.addListener) {
-    // Deprecated, but still used in older browsers.
-    printMediaQuery.addListener((mql) => {
-        if (mql.matches) autoSizeTextareasInActiveTab();
-    });
-}
+// Setup print handlers
+setupPrintHandlers();
