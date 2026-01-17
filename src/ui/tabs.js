@@ -58,8 +58,8 @@ export function rebuildTabButton(tabId, title, storageKey, closeTabFn) {
     btn.dataset.storageKey = storageKey;
 
     const closeBtn = document.createElement('span');
+    closeBtn.className = 'tab-close';
     closeBtn.textContent = ' ×';
-    closeBtn.style.cursor = 'pointer';
     closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         closeTabFn(tabId);
@@ -90,8 +90,8 @@ export function syncTabTitleFromStudentName(tabId, { persistFn, updateTabListFn 
 
         // Re-add close button
         const closeBtn = document.createElement('span');
+        closeBtn.className = 'tab-close';
         closeBtn.textContent = ' ×';
-        closeBtn.style.cursor = 'pointer';
         closeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             // Close will be handled by the parent module

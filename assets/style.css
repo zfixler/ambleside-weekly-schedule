@@ -1,60 +1,111 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f9f9f9;
+/* Ambleside Weekly Schedule - Styles */
+
+/* ============================================
+   Custom Properties
+   ============================================ */
+:root {
+    /* Colors */
+    --color-primary: #4CAF50;
+    --color-primary-hover: #45a049;
+    --color-text: #333;
+    --color-text-muted: #555;
+    --color-text-light: #666;
+    --color-border: #ddd;
+    --color-border-dark: #ccc;
+    --color-bg: #f9f9f9;
+    --color-bg-white: #fff;
+    --color-bg-light: #f5f5f5;
+    --color-bg-header: #f2f2f2;
+    --color-highlight: yellow;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 6px;
+    --space-md: 10px;
+    --space-lg: 15px;
+    --space-xl: 20px;
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+
+    /* Shadows */
+    --shadow-card: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    /* Typography */
+    --font-family: Arial, sans-serif;
 }
 
+/* ============================================
+   Base Styles
+   ============================================ */
+body {
+    font-family: var(--font-family);
+    margin: var(--space-xl);
+    background-color: var(--color-bg);
+}
+
+h1 {
+    text-align: center;
+    color: var(--color-text);
+}
+
+/* ============================================
+   Form Elements
+   ============================================ */
+input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-sm);
+}
+
+button {
+    background-color: var(--color-primary);
+    color: white;
+    padding: var(--space-md) var(--space-lg);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-right: var(--space-md);
+}
+
+button:hover {
+    background-color: var(--color-primary-hover);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   Tabs Container
+   ============================================ */
 #tabs {
     max-width: 800px;
     margin: 0 auto;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.tab-buttons {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 6px 0 6px;
-    background: #fff;
-    border-radius: 8px 8px 0 0;
-    overflow-x: auto;
-}
-
-.tab-button {
-    background: none;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    color: #000;
-    font-weight: normal;
-}
-
-.tab-button.active {
-    border-bottom: 2px solid #4CAF50;
-    font-weight: bold;
-    background-color: #fff;
-}
-
-.tab-button:hover {
-    background: #f0f0f0;
-}
-
-#add-tab {
-    margin-left: auto;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
 }
 
 .tab-content {
     background: white;
-    padding: 20px;
-    border-radius: 0 0 8px 8px;
+    padding: var(--space-xl);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     box-shadow: none;
 }
 
@@ -66,61 +117,33 @@ body {
     display: block;
 }
 
-.form-container {
-    max-width: 800px;
-    margin: 0 auto;
+/* ============================================
+   Tab Buttons
+   ============================================ */
+.tab-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-sm) 0 var(--space-sm);
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    overflow-x: auto;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-/* Tab styling (override generic button styles) */
 .tab-buttons .tab-button {
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
-    gap: 6px;
-    background: #f5f5f5;
+    gap: var(--space-sm);
+    background: var(--color-bg-light);
     color: #222;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-bottom: none;
-    border-radius: 6px 6px 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
     padding: 8px 12px;
     margin: 0;
+    cursor: pointer;
+    font-weight: normal;
 }
 
 .tab-buttons .tab-button:hover {
@@ -128,37 +151,42 @@ button:hover {
 }
 
 .tab-buttons .tab-button.active {
-    background: #fff;
+    background: var(--color-bg-white);
     font-weight: 700;
-    box-shadow: inset 0 -2px 0 #4CAF50;
+    box-shadow: inset 0 -2px 0 var(--color-primary);
 }
 
-.tab-buttons .tab-button span {
-    color: #666;
+.tab-buttons .tab-button span,
+.tab-buttons .tab-button .tab-close {
+    color: var(--color-text-light);
     font-weight: 700;
     line-height: 1;
+    cursor: pointer;
 }
 
-.tab-buttons .tab-button:hover span {
+.tab-buttons .tab-button:hover span,
+.tab-buttons .tab-button:hover .tab-close {
     color: #111;
 }
 
-#add-tab {
+.tab-buttons #add-tab {
     flex: 0 0 auto;
     width: 32px;
     height: 32px;
     padding: 0;
-    border-radius: 6px;
+    margin-left: auto;
+    border-radius: var(--radius-md);
     line-height: 32px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
 }
 
-.tab-content {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-
+/* ============================================
+   Readings Container & Tables Layout
+   ============================================ */
 .readings-container {
-    margin-top: 20px;
+    margin-top: var(--space-xl);
 }
 
 .tables-div {
@@ -168,35 +196,39 @@ button:hover {
 .table-section {
     width: 100%;
     padding: 0;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-xl);
     display: flex;
     flex-direction: column;
 }
 
 .table-section h3 {
     text-align: center;
-    margin-bottom: 10px;
-    color: #555;
+    margin-bottom: var(--space-md);
+    color: var(--color-text-muted);
 }
 
+/* ============================================
+   Readings Table
+   ============================================ */
 .readings-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-xl);
 }
 
-.readings-table th, .readings-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
+.readings-table th,
+.readings-table td {
+    border: 1px solid var(--color-border);
+    padding: var(--space-md);
     text-align: left;
 }
 
 .readings-table th {
-    background-color: #f2f2f2;
+    background-color: var(--color-bg-header);
     font-weight: bold;
 }
 
-/* Completed column only needs room for a checkmark */
+/* Completed column - narrow for checkmark */
 .readings-table th:nth-child(2),
 .readings-table td:nth-child(2) {
     width: 36px;
@@ -219,44 +251,37 @@ button:hover {
     overflow: hidden;
 }
 
-.notes-section {
-    margin-top: 20px;
-}
-
-.notes-section h3 {
-    margin-bottom: 10px;
-    color: #555;
-}
-
-.notes-textarea {
-    width: 100%;
-    height: 100px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-}
-
-.subjects-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
+/* ============================================
+   Subjects Table
+   ============================================ */
 .subjects-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    margin-top: var(--space-xl);
 }
 
-.subjects-table th, .subjects-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
+.subjects-table th,
+.subjects-table td {
+    border: 1px solid var(--color-border);
+    padding: var(--space-md);
 }
 
 .subjects-table th {
-    background-color: #f2f2f2;
+    background-color: var(--color-bg-header);
     font-weight: bold;
+}
+
+/* Subject name column */
+.subjects-table th:nth-child(1),
+.subjects-table td:nth-child(1) {
+    width: 40%;
+}
+
+/* Day columns */
+.subjects-table th:nth-child(n+2),
+.subjects-table td:nth-child(n+2) {
+    width: 12%;
 }
 
 .subjects-table td input[type="text"] {
@@ -264,14 +289,8 @@ button:hover {
     border: none;
 }
 
-.subjects-table th:nth-child(1),
-.subjects-table td:nth-child(1) {
-    width: 40%;
-}
-
-.subjects-table th:nth-child(n+2),
-.subjects-table td:nth-child(n+2) {
-    width: 12%;
+.subjects-table td.highlighted {
+    background-color: var(--color-highlight);
 }
 
 .day-button {
@@ -280,27 +299,86 @@ button:hover {
     border: none;
     background: none;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
 }
 
-.subjects-table td.highlighted {
-    background-color: yellow;
+/* ============================================
+   Notes Section
+   ============================================ */
+.notes-section {
+    margin-top: var(--space-xl);
 }
 
+.notes-section h3 {
+    margin-bottom: var(--space-md);
+    color: var(--color-text-muted);
+}
+
+.notes-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 8px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-sm);
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   Action Buttons
+   ============================================ */
 .print-form {
-    margin-top: 10px;
+    margin-top: var(--space-md);
 }
 
-/* Print styles */
-@media print {
-    /* Ensure print output uses a legible, consistent font size.
-       Browsers may otherwise auto-scale content down to fit the page. */
-    html {
-        font-size: 12pt;
-    }
+.add-row {
+    align-self: flex-start;
+}
 
+.remove-row {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    margin-left: var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-row:hover {
+    color: darkred;
+    background: none;
+}
+
+/* ============================================
+   Reading Row Container (flex layout)
+   ============================================ */
+.reading-row-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.reading-row-container textarea {
+    flex: 1;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
     * {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+    }
+
+    html {
+        font-size: 12pt;
     }
 
     body {
@@ -310,30 +388,38 @@ button:hover {
         line-height: 1.25;
     }
 
-    #tabs, .tab-buttons, .tab-content {
+    /* Hide non-print elements */
+    button,
+    #add-tab,
+    .tab-buttons,
+    .remove-row,
+    .add-row {
+        display: none !important;
+    }
+
+    .tab-pane {
+        display: none !important;
+    }
+
+    .tab-pane.active {
+        display: block !important;
+    }
+
+    /* Container resets */
+    #tabs,
+    .tab-content {
         box-shadow: none;
         border: none;
         max-width: none;
         padding: 6px;
     }
-    button, #add-tab {
-        display: none;
-    }
-    .tab-pane {
-        display: none !important;
-    }
-    .tab-pane.active {
-        display: block !important;
-    }
-    .tab-buttons {
-        display: none;
-    }
+
     .form-container {
         display: block !important;
         margin-bottom: 10px;
     }
 
-    /* Keep Student / Year / Week on one line in print */
+    /* Form header layout */
     .weekly-form {
         display: block;
     }
@@ -351,11 +437,13 @@ button:hover {
         white-space: nowrap;
         min-width: 0;
     }
+
     .form-group label {
         display: inline;
         font-weight: bold;
         margin-right: 5px;
     }
+
     .form-group input {
         border: none;
         background: transparent;
@@ -364,58 +452,66 @@ button:hover {
         margin: 0;
         min-width: 0;
     }
+
+    /* Tables side by side */
     .tables-div {
         display: flex;
         width: 100%;
         gap: 6px;
         align-items: flex-start;
     }
+
     .table-section {
         padding: 0;
         margin-bottom: 0;
     }
 
-    /* Match the PDF: This Week on the left, Ambleside Readings on the right */
-    .table-section:nth-child(1) {
-        flex: 0 0 65%;
-        order: 2;
-    }
-    .table-section:nth-child(2) {
-        flex: 0 0 35%;
-        order: 1;
-    }
     .table-section h3 {
         text-align: center;
         margin: 0 0 5px;
         font-weight: bold;
     }
+
+    /* Readings on right (65%), Subjects on left (35%) */
+    .table-section:nth-child(1) {
+        flex: 0 0 65%;
+        order: 2;
+    }
+
+    .table-section:nth-child(2) {
+        flex: 0 0 35%;
+        order: 1;
+    }
+
+    /* Readings table print */
     .readings-table {
         width: 100%;
         margin: 0;
         border-collapse: collapse;
         border-spacing: 0;
-    }
-    .subjects-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 0;
-        table-layout: fixed;
-        border-spacing: 0;
-    }
-    .readings-table th, .readings-table td, .subjects-table th, .subjects-table td {
-        border: 1px solid #000;
-        padding: 4px;
-        text-align: left;
+        font-size: 11pt;
     }
 
-    /* Reading rows: keep them as tight as possible in print */
-    .readings-table th, .readings-table td {
+    .readings-table th,
+    .readings-table td {
+        border: 1px solid #000;
         padding: 5px;
+        text-align: left;
         vertical-align: top;
     }
 
+    .readings-table th {
+        background: #f0f0f0;
+        font-weight: bold;
+    }
+
+    .readings-table th:nth-child(2),
+    .readings-table td:nth-child(2) {
+        width: 18px;
+        text-align: center;
+    }
+
     .readings-table td textarea {
-        /* textarea is inline-block by default; block removes baseline gap */
         display: block;
         width: 100%;
         margin: 0;
@@ -425,23 +521,38 @@ button:hover {
         line-height: 1.1;
     }
 
-    /* Keep subjects compact and consistent */
-    .subjects-table th, .subjects-table td {
+    /* Subjects table print */
+    .subjects-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        table-layout: fixed;
+        border-spacing: 0;
+        font-size: 11pt;
+    }
+
+    .subjects-table th,
+    .subjects-table td {
+        border: 1px solid #000;
         height: 18px;
         padding: 6px;
         line-height: 1.1;
         vertical-align: top;
     }
 
-    .readings-table th, .subjects-table th {
+    .subjects-table th {
         background: #f0f0f0;
         font-weight: bold;
     }
 
-    .readings-table th:nth-child(2),
-    .readings-table td:nth-child(2) {
-        width: 18px;
-        text-align: center;
+    .subjects-table th:nth-child(1),
+    .subjects-table td:nth-child(1) {
+        width: 52%;
+    }
+
+    .subjects-table th:nth-child(n+2),
+    .subjects-table td:nth-child(n+2) {
+        width: 9.6%;
     }
 
     .subjects-table td input[type="text"] {
@@ -457,20 +568,10 @@ button:hover {
         box-sizing: border-box;
     }
 
-    /* The subjects table lives in a narrower column; give the Subject name more room. */
-    .subjects-table th:nth-child(1),
-    .subjects-table td:nth-child(1) {
-        width: 52%;
-    }
-    .subjects-table th:nth-child(n+2),
-    .subjects-table td:nth-child(n+2) {
-        width: 9.6%;
+    .subjects-table td.highlighted {
+        background-color: yellow !important;
     }
 
-    /* Tables often end up looking smaller than the surrounding text; keep them readable. */
-    .readings-table, .subjects-table {
-        font-size: 11pt;
-    }
     .day-button {
         width: 100%;
         height: 18px;
@@ -482,16 +583,17 @@ button:hover {
         line-height: 1;
         box-sizing: border-box;
     }
-    .subjects-table td.highlighted {
-        background-color: yellow !important;
-    }
+
+    /* Notes print */
     .notes-section {
         clear: both;
         margin-top: 10px;
     }
+
     .notes-section h3 {
         margin-bottom: 5px;
     }
+
     .notes-textarea {
         border: 1px solid #000;
         background: transparent;
@@ -500,8 +602,41 @@ button:hover {
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
-        /* Keep notes from running off the page in print */
         max-height: 2.2in;
         overflow: hidden;
+    }
+
+    /* Reading row container print */
+    .reading-row-container {
+        display: block;
+    }
+
+    /* Readings container spacing */
+    .readings-container {
+        margin-top: 10px;
+    }
+
+    /* Reduce h1 margins for print */
+    h1 {
+        margin: 0 0 8px 0;
+        font-size: 16pt;
+    }
+
+    /* Page break control - keep everything together */
+    .form-container {
+        page-break-inside: avoid;
+    }
+
+    .weekly-form {
+        page-break-inside: avoid;
+    }
+
+    .readings-container {
+        page-break-before: avoid;
+    }
+
+    .tables-div {
+        page-break-before: avoid;
+        page-break-inside: avoid;
     }
 }

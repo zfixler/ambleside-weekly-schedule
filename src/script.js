@@ -411,8 +411,8 @@ function rebuildTabButton(tabId, title, storageKey) {
     btn.dataset.storageKey = storageKey;
 
     const closeBtn = document.createElement('span');
+    closeBtn.className = 'tab-close';
     closeBtn.textContent = ' ×';
-    closeBtn.style.cursor = 'pointer';
     closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         closeTab(tabId);
@@ -476,8 +476,8 @@ function createTab(options = {}) {
 
     // Add close button to tab
     const closeBtn = document.createElement('span');
+    closeBtn.className = 'tab-close';
     closeBtn.textContent = ' ×';
-    closeBtn.style.cursor = 'pointer';
     closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         closeTab(tabId);
