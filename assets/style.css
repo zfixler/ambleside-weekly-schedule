@@ -544,7 +544,8 @@ label {
     #add-tab,
     .tab-buttons,
     .remove-row,
-    .add-row {
+    .add-row,
+    .app-footer {
         display: none !important;
     }
 
@@ -1074,7 +1075,62 @@ label {
     }
 }
 
-/* Extra small mobile devices */
+/* ============================================
+   Footer
+   ============================================ */
+.app-footer {
+    margin-top: var(--space-2xl);
+    padding: var(--space-xl) var(--space-lg);
+    background: linear-gradient(135deg, #f0fdf4 0%, #f9fafb 100%);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.app-footer p {
+    margin: var(--space-md) 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+.app-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.app-footer a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+}
+
+.footer-credit {
+    font-size: 12px;
+    color: var(--color-text-light);
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+}
+
+@media screen and (max-width: 768px) {
+    .app-footer {
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .app-footer p {
+        font-size: 12px;
+    }
+}
+
+/* ============================================
+   Extra small mobile devices
+   ============================================ */
 @media screen and (max-width: 480px) {
     body {
         padding: var(--space-sm);
