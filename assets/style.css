@@ -524,23 +524,18 @@ label {
     }
 
     html {
-        font-size: 9pt;
-        height: 100%;
+        font-size: 11pt;
     }
 
     body {
         margin: 0;
-        padding: 3px 4px;
+        padding: 8px 12px;
         background: white;
-        font-size: 9pt;
-        line-height: 1;
-        color: #1f2937;
+        font-size: 11pt;
+        line-height: 1.3;
+        color: #000000;
         width: 100%;
         max-width: 100%;
-        overflow-x: hidden;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
     }
 
     /* Hide non-print elements */
@@ -568,7 +563,7 @@ label {
         border: none;
         max-width: none;
         width: 100%;
-        padding: 8px 12px;
+        padding: 0;
     }
 
     .form-container {
@@ -580,22 +575,25 @@ label {
 
     /* Form header layout */
     .weekly-form {
-        display: block;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 15px;
         width: 100%;
         max-width: 100%;
-        flex-shrink: 0;
+        margin-bottom: 10px;
     }
 
     .weekly-form > .form-group {
         display: inline-flex;
         align-items: baseline;
-        gap: 2px;
-        margin: 0 8px 1px 0;
+        gap: 5px;
+        margin: 0;
+        white-space: nowrap;
     }
 
     .form-group {
         margin: 0;
-        margin-top: 2rem;
         white-space: nowrap;
     }
 
@@ -603,36 +601,30 @@ label {
         display: inline;
         font-weight: 600;
         margin: 0;
-        font-size: 8pt;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.1pt;
+        font-size: 11pt;
+        color: #000000;
+        text-transform: none;
+        letter-spacing: 0;
     }
 
     .form-group input {
         border: none;
-        border-bottom: 0.5pt solid #d1d5db;
         background: transparent;
         width: auto;
-        min-width: 40px;
+        min-width: 30px;
         padding: 0;
         margin: 0;
-        font-size: 9pt;
-        font-weight: 600;
-        color: #111827;
+        font-size: 11pt;
+        font-weight: 400;
+        color: #000000;
     }
 
     /* Container for positioning */
     .readings-container {
         position: relative;
-        margin-top: 2rem;
+        margin-top: 8px;
         width: 100%;
         max-width: 100%;
-        flex: 1;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
     }
 
     /* Tables side by side */
@@ -640,44 +632,38 @@ label {
         display: flex;
         width: 100%;
         max-width: 100%;
-        gap: 1rem;
-        align-items: stretch;
+        gap: 15px;
+        align-items: flex-start;
         margin: 0;
         padding: 0;
-        flex: 1;
-        overflow: hidden;
-        min-height: 0;
     }
 
     .table-section {
         padding: 0;
         margin: 0;
-        overflow: hidden;
         display: flex;
         flex-direction: column;
-        min-height: 0;
     }
 
     .table-section h3 {
-        text-align: left;
-        margin: 0 0 1rem;
-        font-weight: 700;
-        font-size: 10pt;
-        color: #1f2937;
+        text-align: center;
+        margin: 0 0 5px 0;
+        font-weight: 600;
+        font-size: 12pt;
+        color: #000000;
         text-transform: none;
         letter-spacing: 0;
-        flex-shrink: 0;
     }
 
-    /* Subjects on left (35%) */
+    /* Subjects on left (35%) - This Week */
     .table-section:nth-child(2) {
-        flex: 0 0 32%;
+        flex: 0 0 35%;
         order: 1;
     }
 
-    /* Readings on right (65%) */
+    /* Readings on right (65%) - Ambleside Readings */
     .table-section:nth-child(1) {
-        flex: 0 0 63%;
+        flex: 0 0 60%;
         order: 2;
     }
 
@@ -687,48 +673,36 @@ label {
         margin: 0;
         border-collapse: collapse;
         border-spacing: 0;
-        font-size: 8pt;
-        border: 1pt solid #374151;
-        border-radius: 0;
-        flex: 1;
-        min-height: 0;
+        font-size: 11pt;
+        border: 1pt solid #000000;
     }
 
     .readings-table th,
     .readings-table td {
-        border: 1pt solid #9ca3af;
-        padding: 2px 3px;
+        border: 1pt solid #000000;
+        padding: 4px 6px;
         text-align: left;
         vertical-align: top;
-        height: auto;
     }
 
     .readings-table th {
-        background: #f3f4f6;
-        font-weight: 700;
-        font-size: 7pt;
-        color: #374151;
-        text-transform: uppercase;
-        letter-spacing: 0.1pt;
-        padding: 2px 3px;
-        flex-shrink: 0;
+        background: #edf2f7;
+        font-weight: 600;
+        font-size: 11pt;
+        color: #000000;
+        text-transform: none;
+        letter-spacing: 0;
     }
 
     .readings-table th:nth-child(2),
     .readings-table td:nth-child(2) {
-        display: table-cell; /* Show in print view */
-        width: 16px;
+        display: table-cell;
+        width: 45px;
         text-align: center;
-        background: #fafafa;
-        padding: 2px 1px;
     }
 
-    .readings-table tbody tr:nth-child(even) {
-        background-color: #fafbfc;
-    }
-
-    .readings-table tbody tr:nth-child(even) td:nth-child(2) {
-        background-color: #f5f5f5;
+    .readings-table tbody tr {
+        background-color: white;
     }
 
     .readings-table td textarea {
@@ -738,14 +712,15 @@ label {
         padding: 0;
         border: 0;
         font-family: var(--font-family);
-        font-size: 8pt;
-        line-height: 1.2;
-        color: #1f2937;
+        font-size: 11pt;
+        line-height: 1.3;
+        color: #000000;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: anywhere;
-        height: auto !important;
-        min-height: 12px;
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+        resize: none;
     }
 
     /* Subjects table print */
@@ -755,44 +730,38 @@ label {
         margin: 0;
         table-layout: fixed;
         border-spacing: 0;
-        font-size: 8pt;
-        border: 1pt solid #374151;
-        border-radius: 0;
-        overflow: hidden;
-        flex: 1;
-        min-height: 0;
+        font-size: 11pt;
+        border: 1pt solid #000000;
     }
 
     .subjects-table th,
     .subjects-table td {
-        border: 1pt solid #9ca3af;
-        min-height: 13px;
-        padding: 2px;
-        line-height: 1.1;
-        vertical-align: top;
-        height: auto;
+        border: 1pt solid #000000;
+        padding: 4px;
+        line-height: 1.3;
+        vertical-align: middle;
     }
 
     .subjects-table th {
-        background: #f3f4f6;
-        font-weight: 700;
-        font-size: 7pt;
-        color: #374151;
-        padding: 2px;
-        flex-shrink: 0;
+        background: #edf2f7;
+        font-weight: 600;
+        font-size: 11pt;
+        color: #000000;
+        text-align: center;
+        text-transform: none;
     }
 
     .subjects-table th:nth-child(1),
     .subjects-table td:nth-child(1) {
-        width: 55%;
-        padding-left: 3px;
+        width: 50%;
+        text-align: left;
+        padding-left: 8px;
     }
 
     .subjects-table th:nth-child(n+2),
     .subjects-table td:nth-child(n+2) {
-        width: 9%;
+        width: 10%;
         text-align: center;
-        font-weight: 600;
     }
 
     .subjects-table td input[type="text"] {
@@ -800,76 +769,65 @@ label {
         background: transparent;
         width: 100%;
         font-family: var(--font-family);
-        font-size: 8pt;
-        color: #1f2937;
+        font-size: 11pt;
+        color: #000000;
         padding: 0;
         margin: 0;
         display: block;
-        line-height: 1.15;
-        min-height: 13px;
-        height: auto;
+        line-height: 1.3;
         box-sizing: border-box;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        overflow-wrap: anywhere;
     }
 
     .subjects-table td.highlighted {
         background-color: #fef3c7 !important;
-        font-weight: 700;
     }
 
     .day-button {
         width: 100%;
-        min-height: 16px;
         height: 100%;
         border: 0;
         background: none;
         padding: 0;
         margin: 0;
         display: block;
-        line-height: 1;
         box-sizing: border-box;
     }
 
-    /* Notes print - positioned in left column below subjects */
+    /* Hide empty rows in print */
+    tr.empty-row {
+        display: none !important;
+    }
+
+    /* Notes print - full width below tables */
     .notes-section {
-        width: 35%;
-        margin-left: 0;
-        margin-top: 1rem;
+        width: 100%;
+        margin-top: 10px;
         box-sizing: border-box;
-        flex-shrink: 0;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
     }
 
     .notes-section h3 {
-        margin: 0 0 2px 0;
-        font-size: 8pt;
+        margin: 0 0 5px 0;
+        font-size: 12pt;
         font-weight: 600;
-        color: #1f2937;
+        color: #4a5568;
         text-align: left;
-        flex-shrink: 0;
+        text-transform: none;
+        letter-spacing: 0;
     }
 
     .notes-textarea {
-        border: none;
-        border-radius: 0;
-        background: transparent;
+        border: 1pt solid #cbd5e0;
+        border-radius: 3pt;
+        background: white;
         margin-bottom: 0;
         resize: none;
         width: 100%;
-        max-width: 100%;
         box-sizing: border-box;
-        overflow: visible;
-        padding: 0;
-        font-size: 8pt;
+        padding: 6px;
+        font-size: 11pt;
         line-height: 1.3;
-        color: #1f2937;
-        flex-shrink: 0;
-        min-height: auto;
-        max-height: none;
+        color: #2d3748;
+        min-height: 50px;
     }
 
     /* Reading row container print */
@@ -877,18 +835,16 @@ label {
         display: block;
     }
 
-
     /* Title styling for print */
     h1 {
-        margin: 0 0 2px 0;
-        font-size: 14pt;
-        font-weight: 700;
-        color: #111827;
-        letter-spacing: -0.2pt;
+        margin: 0 0 8px 0;
+        font-size: 18pt;
+        font-weight: 600;
+        color: #4a5568;
+        letter-spacing: 0;
         text-align: center;
-        padding-bottom: 1px;
-        border-bottom: 1pt solid #10b981;
-        flex-shrink: 0;
+        padding-bottom: 0;
+        border-bottom: none;
     }
 
     /* Keep everything on one page */

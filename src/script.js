@@ -20,7 +20,7 @@ import {
 import { createReadingsTable, createNotesSection } from './ui/readings.js';
 import { createSubjectsTable, setupSubjectsListeners, applySubjectsState } from './ui/subjects.js';
 import { createTabPaneStructure, clearTabUi } from './ui/tabs.js';
-import { setupPrintHandlers } from './ui/print.js';
+import { preparePrint, setupPrintHandlers } from './ui/print.js';
 import readingLibraryData from '../assets/readingLibrary.json';
 
 // Application state
@@ -528,12 +528,7 @@ function createTab(options = {}) {
     });
 
     printButton.addEventListener('click', () => {
-        persistTabImmediately(tabId, { silent: true });
-        autoSizeTextareasInTab(tabId);
-        requestAnimationFrame(() => {
-            autoSizeTextareasInTab(tabId);
-            window.print();
-        });
+        preparePrint(tabId, (id) => persistTabImmediately(id, { silent: true }));
     });
 
     updateTabListEntry(storageKey, title);
@@ -629,12 +624,7 @@ async function init() {
         });
 
         document.querySelector('#tab1 .print-form')?.addEventListener('click', () => {
-            persistTabImmediately('tab1', { silent: true });
-            autoSizeTextareasInTab('tab1');
-            requestAnimationFrame(() => {
-                autoSizeTextareasInTab('tab1');
-                window.print();
-            });
+            preparePrint('tab1', (id) => persistTabImmediately(id, { silent: true }));
         });
 
         btn?.addEventListener('click', () => switchTab(tabId));

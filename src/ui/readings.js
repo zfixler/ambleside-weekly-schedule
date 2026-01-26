@@ -17,7 +17,7 @@ export function createReadingsTable({ allReadings, keptIndices, keptDefaultLengt
         <thead>
             <tr>
                 <th>Reading</th>
-                <th>Completed</th>
+                <th>Done</th>
             </tr>
         </thead>
         <tbody>

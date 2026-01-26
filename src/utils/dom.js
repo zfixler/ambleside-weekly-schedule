@@ -22,12 +22,17 @@ export function slugifyTitle(title) {
  */
 export function autoSizeTextarea(textarea) {
     if (!textarea) return;
-    // Reset first, then set to scrollHeight. Add a buffer to avoid
+    // Set rows to 1 to ensure single-line textareas don't show extra rows
+    textarea.rows = 1;
+    // Reset height to auto, then set to scrollHeight. Add a buffer to avoid
     // sub-pixel rounding causing the last line to be clipped (common in print).
     textarea.style.height = 'auto';
-    textarea.style.overflow = 'visible';
-    const extra = 4;
-    textarea.style.height = `${textarea.scrollHeight + extra}px`;
+    textarea.style.overflowY = 'hidden';
+    // Force a reflow to ensure scrollHeight is accurate
+    void textarea.offsetHeight;
+    const extra = 1;
+    const newHeight = textarea.scrollHeight + extra;
+    textarea.style.height = `${newHeight}px`;
 }
 
 /**
