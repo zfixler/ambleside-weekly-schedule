@@ -101,18 +101,25 @@ function removeTabListEntry(storageKey) {
  */
 function loadReadingLibrary() {
     console.log('Loading reading library...');
-    readingLibrary = readingLibraryData;
+    readingLibrary = readingLibraryData || {};
 }
 
 /**
  * Gets readings for a specific year and week.
  */
 function getReadings(year, week) {
+    // Ensure library is loaded
+    if (!readingLibrary || Object.keys(readingLibrary).length === 0) {
+        console.warn('Reading library appears empty in getReadings, attempting to reload...');
+        loadReadingLibrary();
+    }
+
     const yearNum = parseInt(year, 10);
     const weekNum = parseInt(week, 10);
     const yearKey = `year_${yearNum}`;
     const weekKey = `week_${weekNum}`;
-    if (readingLibrary[yearKey] && readingLibrary[yearKey][weekKey]) {
+
+    if (readingLibrary && readingLibrary[yearKey] && readingLibrary[yearKey][weekKey]) {
         return readingLibrary[yearKey][weekKey];
     }
     return null;
@@ -560,6 +567,8 @@ function closeTab(tabId) {
  * Initializes the application.
  */
 async function init() {
+    loadReadingLibrary();
+
     // Initialize storage backend (handles migration)
     try {
         storage = await getStorageBackend();
@@ -569,67 +578,21 @@ async function init() {
         storage = new LocalStorageBackend();
     }
 
-    loadReadingLibrary();
-
     document.getElementById('add-tab').addEventListener('click', () => createTab());
 
     const savedTabs = getTabList();
+
+    // Always clear the static or existing UI to ensure a clean state
+    clearTabUi();
+    tabCounter = 0;
+
     if (savedTabs.length > 0) {
-        clearTabUi();
-        tabCounter = 0;
         for (const t of savedTabs) {
             createTab({ title: t.title || 'Form', storageKey: t.storageKey });
         }
     } else {
-        // Wire up the initial scaffolded tab1
-        const tabId = 'tab1';
-        const btn = getTabButton(tabId) || document.querySelector('.tab-button');
-        const title = (btn?.textContent || 'Form 1').replace(/\s*×\s*$/, '').trim();
-        const storageKey = uniqueStorageKey(slugifyTitle(title));
-        if (btn) {
-            btn.dataset.tab = tabId;
-            btn.dataset.title = title;
-            btn.dataset.storageKey = storageKey;
-            btn.addEventListener('dblclick', (e) => {
-                if (e.target && e.target.nodeName === 'SPAN') return;
-                renameTab(tabId);
-            });
-        }
-        updateTabListEntry(storageKey, title);
-
-        document.getElementById('student-name-1')?.addEventListener('input', () => {
-            syncTabTitleFromStudentName(tabId);
-        });
-        document.getElementById('student-name-1')?.addEventListener('change', () => {
-            syncTabTitleFromStudentName(tabId, { persist: true });
-        });
-        document.getElementById('year-1')?.addEventListener('input', () => {
-            persistTab(tabId, { silent: true });
-        });
-        document.getElementById('week-1')?.addEventListener('input', () => {
-            persistTab(tabId, { silent: true });
-        });
-
-        document.querySelector('#tab1 .load-readings')?.addEventListener('click', () => {
-            const year = document.getElementById('year-1').value;
-            const week = document.getElementById('week-1').value;
-            if (year && week) {
-                const state = captureTabState(tabId);
-                populateReadings(year, week, tabId);
-                applyTabState(tabId, state);
-                persistTabImmediately(tabId, { silent: true });
-            } else {
-                alert('Please enter year and week.');
-            }
-        });
-
-        document.querySelector('#tab1 .print-form')?.addEventListener('click', () => {
-            preparePrint('tab1', (id) => persistTabImmediately(id, { silent: true }));
-        });
-
-        btn?.addEventListener('click', () => switchTab(tabId));
-        loadTab(tabId);
-        syncTabTitleFromStudentName(tabId);
+        // Create the initial tab using the standard creation logic
+        createTab({ title: 'Form 1' });
     }
 }
 
