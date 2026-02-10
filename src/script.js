@@ -139,7 +139,7 @@ function syncTabTitleFromStudentName(tabId, { persist = false } = {}) {
 
     const nextTitle = studentName || getDefaultTabTitle(tabId);
     if (nextTitle !== getTabTitle(tabId)) {
-        rebuildTabButton(tabId, nextTitle, storageKey);
+        rebuildTabButton(tabId, nextTitle, storageKey, closeTab);
         updateTabListEntry(storageKey, nextTitle);
     }
 
@@ -471,7 +471,7 @@ function renameTab(tabId) {
         removeTabListEntry(oldStorageKey);
     }
 
-    rebuildTabButton(tabId, nextTitle, newStorageKey);
+    rebuildTabButton(tabId, nextTitle, newStorageKey, closeTab);
     updateTabListEntry(newStorageKey, nextTitle);
 }
 
