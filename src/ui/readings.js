@@ -3,14 +3,12 @@ import { autoSizeTextarea } from '../utils/dom.js';
 /**
  * Creates the readings table UI.
  * @param {Object} options
- * @param {string[]} allReadings - Combined default and custom readings
- * @param {number[]} keptIndices - Indices of kept default readings
- * @param {number} keptDefaultLength - Number of kept default readings
- * @param {string} tabId
- * @param {Function} persistFn - Function to call when data changes
+ * @param {Array<{text: string, type: 'default'|'custom', index?: number}>} options.items
+ * @param {string} options.tabId
+ * @param {Function} options.persistFn - Function to call when data changes
  * @returns {Object} Object containing readingsTable and addBtn elements
  */
-export function createReadingsTable({ allReadings, keptIndices, keptDefaultLength, tabId, persistFn }) {
+export function createReadingsTable({ items, tabId, persistFn }) {
     const readingsTable = document.createElement('table');
     readingsTable.className = 'readings-table';
     readingsTable.innerHTML = `
@@ -26,16 +24,18 @@ export function createReadingsTable({ allReadings, keptIndices, keptDefaultLengt
 
     const readingsTbody = readingsTable.querySelector('tbody');
 
-    allReadings.forEach((reading, i) => {
+    items.forEach(item => {
         const row = createReadingRow({
-            reading,
-            isDefault: i < keptDefaultLength,
-            defaultIndex: i < keptDefaultLength ? keptIndices[i] : undefined,
+            text: item.text,
+            type: item.type,
+            index: item.index,
             tabId,
             persistFn
         });
         readingsTbody.appendChild(row);
     });
+
+    setupRowReorder(readingsTbody, persistFn, tabId);
 
     // Add row button
     const addBtn = document.createElement('button');
@@ -46,8 +46,8 @@ export function createReadingsTable({ allReadings, keptIndices, keptDefaultLengt
     addBtn.addEventListener('click', () => {
         const tbody = readingsTable.querySelector('tbody');
         const row = createReadingRow({
-            reading: '',
-            isDefault: false,
+            text: '',
+            type: 'custom',
             tabId,
             persistFn
         });
@@ -63,12 +63,12 @@ export function createReadingsTable({ allReadings, keptIndices, keptDefaultLengt
  * @param {Object} options
  * @returns {HTMLTableRowElement}
  */
-function createReadingRow({ reading, isDefault, defaultIndex, tabId, persistFn }) {
+function createReadingRow({ text, type, index, tabId, persistFn }) {
     const row = document.createElement('tr');
 
-    if (isDefault) {
+    if (type === 'default') {
         row.dataset.type = 'default';
-        row.dataset.index = defaultIndex;
+        row.dataset.index = index;
     } else {
         row.dataset.type = 'custom';
     }
@@ -77,8 +77,14 @@ function createReadingRow({ reading, isDefault, defaultIndex, tabId, persistFn }
     const readingContainer = document.createElement('div');
     readingContainer.className = 'reading-row-container';
 
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'drag-handle';
+    dragHandle.setAttribute('aria-label', 'Drag to reorder');
+    dragHandle.textContent = '⠿';
+    readingContainer.appendChild(dragHandle);
+
     const readingTextarea = document.createElement('textarea');
-    readingTextarea.value = String(reading ?? '');
+    readingTextarea.value = String(text ?? '');
     readingTextarea.addEventListener('input', () => autoSizeTextarea(readingTextarea));
     readingTextarea.addEventListener('input', () => persistFn(tabId, { silent: true }));
     readingContainer.appendChild(readingTextarea);
@@ -99,6 +105,65 @@ function createReadingRow({ reading, isDefault, defaultIndex, tabId, persistFn }
     row.appendChild(completedCell);
 
     return row;
+}
+
+/**
+ * Sets up pointer-based drag-to-reorder on a tbody.
+ * Works for both mouse and touch.
+ */
+function setupRowReorder(tbody, persistFn, tabId) {
+    let dragging = null, placeholder = null, startY = 0, moved = false;
+
+    tbody.addEventListener('pointerdown', e => {
+        const handle = e.target.closest('.drag-handle');
+        if (!handle) return;
+        const row = handle.closest('tr');
+        if (!row) return;
+        e.preventDefault();
+        dragging = row;
+        startY = e.clientY;
+        moved = false;
+        placeholder = document.createElement('tr');
+        placeholder.className = 'drag-placeholder';
+        placeholder.innerHTML = '<td colspan="2"></td>';
+        document.addEventListener('pointermove', onMove, { passive: false });
+        document.addEventListener('pointerup', onUp);
+        document.addEventListener('pointercancel', onUp);
+    });
+
+    function onMove(e) {
+        if (!dragging) return;
+        e.preventDefault();
+        if (!moved && Math.abs(e.clientY - startY) > 4) {
+            moved = true;
+            dragging.after(placeholder);
+            dragging.classList.add('is-dragging');
+        }
+        if (!moved) return;
+        dragging.style.display = 'none';
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        dragging.style.display = '';
+        const targetRow = el?.closest('tr');
+        if (targetRow && targetRow !== placeholder && targetRow !== dragging && targetRow.closest('tbody') === tbody) {
+            const { top, height } = targetRow.getBoundingClientRect();
+            if (e.clientY < top + height / 2) tbody.insertBefore(placeholder, targetRow);
+            else targetRow.after(placeholder);
+        }
+    }
+
+    function onUp() {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+        if (!dragging) return;
+        if (moved && placeholder.parentElement) tbody.insertBefore(dragging, placeholder);
+        placeholder.remove();
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+        placeholder = null;
+        moved = false;
+        persistFn(tabId, { silent: true });
+    }
 }
 
 /**

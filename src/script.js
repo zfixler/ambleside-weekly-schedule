@@ -162,22 +162,33 @@ function populateReadings(year, week, tabId) {
     const data = localStorage.getItem(`${TAB_DATA_PREFIX}${storageKey}`);
     const parsed = data ? JSON.parse(data) : {};
     const isSameWeek = Number(parsed.year) === Number(year) && Number(parsed.week) === Number(week);
-    const removed = isSameWeek ? (parsed.removedIndices || []) : [];
-    const keptIndices = defaultReadings.map((_, i) => i).filter(i => !removed.includes(i));
-    const keptDefault = keptIndices.map(i => defaultReadings[i]);
-    const custom = parsed.customReadings || [];
-    const allReadings = [...keptDefault, ...custom];
 
-    if (!allReadings.length) {
+    let items;
+    if (isSameWeek && parsed.readingsOrder) {
+        // Use readingsOrder as source of truth (new format)
+        items = parsed.readingsOrder.map(r =>
+            r.type === 'default'
+                ? { text: defaultReadings[r.index] ?? '', type: 'default', index: r.index }
+                : { text: r.value, type: 'custom' }
+        );
+    } else {
+        // Legacy: build items from removedIndices + customReadings
+        const removed = isSameWeek ? (parsed.removedIndices || []) : [];
+        const keptIndices = defaultReadings.map((_, i) => i).filter(i => !removed.includes(i));
+        items = [
+            ...keptIndices.map(i => ({ text: defaultReadings[i], type: 'default', index: i })),
+            ...(parsed.customReadings || []).map(v => ({ text: v, type: 'custom' }))
+        ];
+    }
+
+    if (!items.length) {
         container.innerHTML = '<p>No readings found for this year and week.</p>';
         return;
     }
 
     // Create readings table
     const { readingsTable, addBtn } = createReadingsTable({
-        allReadings,
-        keptIndices,
-        keptDefaultLength: keptDefault.length,
+        items,
         tabId,
         persistFn: persistTab
     });
@@ -298,16 +309,21 @@ function persistTabImmediately(tabId, { silent = false } = {}) {
 
     const defaultReadings = getReadings(year, week) || [];
     const allIndices = Array.from({ length: defaultReadings.length }, (_, i) => i);
-    const currentDefaultIndices = [];
-    document.querySelectorAll(`#${tabId} .readings-table tbody tr[data-type="default"]`).forEach(tr => {
-        currentDefaultIndices.push(parseInt(tr.dataset.index));
-    });
-    data.removedIndices = allIndices.filter(i => !currentDefaultIndices.includes(i));
 
-    document.querySelectorAll(`#${tabId} .readings-table tbody tr[data-type="custom"]`).forEach(tr => {
-        const textarea = tr.querySelector('textarea');
-        data.customReadings.push(textarea?.value || '');
+    // Build readingsOrder from DOM order
+    const readingsOrder = [];
+    document.querySelectorAll(`#${tabId} .readings-table tbody tr`).forEach(tr => {
+        if (tr.dataset.type === 'default') {
+            readingsOrder.push({ type: 'default', index: parseInt(tr.dataset.index) });
+        } else {
+            readingsOrder.push({ type: 'custom', value: tr.querySelector('textarea')?.value || '' });
+        }
     });
+    data.readingsOrder = readingsOrder;
+
+    // Backward-compat fields derived from readingsOrder
+    data.removedIndices = allIndices.filter(i => !readingsOrder.some(r => r.type === 'default' && r.index === i));
+    data.customReadings = readingsOrder.filter(r => r.type === 'custom').map(r => r.value);
 
     document.querySelectorAll(`#${tabId} .subjects-table tbody tr`).forEach(tr => {
         const input = tr.querySelector('input[type="text"]');
@@ -536,6 +552,7 @@ function createTab(options = {}) {
                     const parsed = JSON.parse(data);
                     if (Number(parsed.year) === Number(year) && Number(parsed.week) === Number(week)) {
                         parsed.removedIndices = [];
+                        delete parsed.readingsOrder;
                         localStorage.setItem(`${TAB_DATA_PREFIX}${sk}`, JSON.stringify(parsed));
                     }
                 }

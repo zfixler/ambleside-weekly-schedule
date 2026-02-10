@@ -529,6 +529,29 @@ label {
 }
 
 /* ============================================
+   Drag Handle
+   ============================================ */
+.drag-handle {
+    cursor: grab;
+    color: var(--color-text-light);
+    font-size: 16px;
+    padding: 0 var(--space-xs);
+    user-select: none;
+    touch-action: none;
+    flex-shrink: 0;
+    opacity: 0.5;
+    align-self: flex-start;
+    padding-top: 6px;
+}
+.drag-handle:hover { opacity: 1; }
+.is-dragging { opacity: 0.4; }
+.drag-placeholder td {
+    background: var(--color-primary-light);
+    border-top: 2px dashed var(--color-primary);
+    height: 40px;
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 /* ============================================
@@ -542,6 +565,8 @@ label {
         margin: 0.4in;
         size: letter portrait;
     }
+
+    .drag-handle { display: none !important; }
 
     /* Global Resets */
     * {
