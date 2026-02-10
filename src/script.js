@@ -402,13 +402,26 @@ function rebuildTabButton(tabId, title, storageKey) {
     const btn = getTabButton(tabId);
     if (!btn) return;
 
-    btn.textContent = title;
     btn.dataset.title = title;
     btn.dataset.storageKey = storageKey;
 
+    // Update or create the label span
+    let labelSpan = btn.querySelector('.tab-label');
+    if (labelSpan) {
+        labelSpan.textContent = title;
+    } else {
+        btn.textContent = '';
+        labelSpan = document.createElement('span');
+        labelSpan.className = 'tab-label';
+        labelSpan.textContent = title;
+        btn.appendChild(labelSpan);
+    }
+
+    // Remove any existing close button and re-add it
+    btn.querySelector('.tab-close')?.remove();
     const closeBtn = document.createElement('span');
     closeBtn.className = 'tab-close';
-    closeBtn.textContent = ' ×';
+    closeBtn.textContent = '×';
     closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         closeTab(tabId);
@@ -463,7 +476,10 @@ function createTab(options = {}) {
     tabButton.dataset.tab = tabId;
     tabButton.dataset.title = title;
     tabButton.dataset.storageKey = storageKey;
-    tabButton.textContent = title;
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'tab-label';
+    labelSpan.textContent = title;
+    tabButton.appendChild(labelSpan);
     tabButton.addEventListener('click', () => switchTab(tabId));
     tabButton.addEventListener('dblclick', (e) => {
         if (e.target && e.target.nodeName === 'SPAN') return;
@@ -545,10 +561,23 @@ function createTab(options = {}) {
 }
 
 /**
- * Closes a tab.
+ * Closes a tab after confirmation.
  */
 function closeTab(tabId) {
-    if (document.querySelectorAll('.tab-button').length > 1) {
+    if (document.querySelectorAll('.tab-button').length <= 1) return;
+
+    const modal = document.getElementById('close-tab-modal');
+    const confirmBtn = document.getElementById('modal-confirm');
+    const cancelBtn = document.getElementById('modal-cancel');
+    const tabTitle = getTabButton(tabId)?.dataset.title || 'this tab';
+
+    document.getElementById('modal-body').textContent =
+        `"${tabTitle}" and all its data will be permanently deleted.`;
+
+    modal.hidden = false;
+
+    function doClose() {
+        cleanup();
         const storageKey = getTabStorageKey(tabId);
         document.querySelector(`[data-tab="${tabId}"]`).remove();
         document.getElementById(tabId).remove();
@@ -561,6 +590,31 @@ function closeTab(tabId) {
         const remaining = document.querySelector('.tab-button');
         if (remaining) switchTab(remaining.dataset.tab);
     }
+
+    function doCancel() {
+        cleanup();
+    }
+
+    function cleanup() {
+        modal.hidden = true;
+        confirmBtn.removeEventListener('click', doClose);
+        cancelBtn.removeEventListener('click', doCancel);
+        modal.removeEventListener('click', onOverlayClick);
+        document.removeEventListener('keydown', onKeyDown);
+    }
+
+    function onOverlayClick(e) {
+        if (e.target === modal) doCancel();
+    }
+
+    function onKeyDown(e) {
+        if (e.key === 'Escape') doCancel();
+    }
+
+    confirmBtn.addEventListener('click', doClose);
+    cancelBtn.addEventListener('click', doCancel);
+    modal.addEventListener('click', onOverlayClick);
+    document.addEventListener('keydown', onKeyDown);
 }
 
 /**

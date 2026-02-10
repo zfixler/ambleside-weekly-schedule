@@ -167,10 +167,11 @@ label {
 }
 
 .tab-buttons .tab-button {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    text-align: left;
     white-space: nowrap;
-    gap: var(--space-sm);
     background: transparent;
     color: var(--color-text-muted);
     border: none;
@@ -196,7 +197,13 @@ label {
     border-bottom-color: var(--color-primary);
 }
 
-.tab-buttons .tab-button span,
+.tab-buttons .tab-button .tab-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .tab-buttons .tab-button .tab-close {
     color: var(--color-text-light);
     font-weight: 700;
@@ -204,9 +211,16 @@ label {
     cursor: pointer;
     transition: color 0.2s ease;
     opacity: 0.6;
+    flex-shrink: 0;
+    /* Minimum tap target */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+    margin-left: var(--space-md);
 }
 
-.tab-buttons .tab-button:hover span,
 .tab-buttons .tab-button:hover .tab-close {
     opacity: 1;
     color: var(--color-danger);
@@ -883,9 +897,10 @@ label {
     }
 
     .tab-buttons .tab-button {
-        padding: var(--space-sm) var(--space-md);
-        font-size: 13px;
+        padding: var(--space-md) var(--space-lg);
+        font-size: 15px;
         min-width: fit-content;
+        min-height: 44px;
     }
 
     .tab-buttons #add-tab {
@@ -1060,6 +1075,80 @@ label {
 }
 
 /* ============================================
+   Confirm-delete Modal
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal-dialog {
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2xl);
+    max-width: 360px;
+    width: calc(100% - var(--space-2xl) * 2);
+    text-align: center;
+}
+
+.modal-dialog h2 {
+    margin: 0 0 var(--space-sm) 0;
+    font-size: 18px;
+    color: var(--color-text);
+}
+
+.modal-dialog p {
+    margin: 0 0 var(--space-xl) 0;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+}
+
+.modal-btn {
+    flex: 1;
+    margin: 0;
+    padding: var(--space-md) var(--space-lg);
+    font-size: 15px;
+}
+
+.modal-btn-cancel {
+    background: var(--color-bg-light);
+    color: var(--color-text);
+    box-shadow: none;
+}
+
+.modal-btn-cancel:hover {
+    background: var(--color-border-dark);
+    color: var(--color-text);
+    box-shadow: none;
+    transform: none;
+}
+
+.modal-btn-danger {
+    background: var(--color-danger);
+}
+
+.modal-btn-danger:hover {
+    background: var(--color-danger-hover);
+}
+
+/* ============================================
    Footer
    ============================================ */
 .app-footer {
@@ -1129,8 +1218,9 @@ label {
     }
 
     .tab-buttons .tab-button {
-        padding: var(--space-sm) var(--space-sm);
-        font-size: 12px;
+        padding: var(--space-sm) var(--space-md);
+        font-size: 14px;
+        min-height: 44px;
     }
 
     /* Further reduce table padding */

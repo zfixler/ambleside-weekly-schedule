@@ -54,6 +54,18 @@
             </p>
         </div>
     </footer>
+    <!-- Confirm-delete tab modal -->
+    <div id="close-tab-modal" class="modal-overlay" hidden>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h2 id="modal-title">Delete tab?</h2>
+            <p id="modal-body">All data for this tab will be permanently deleted.</p>
+            <div class="modal-actions">
+                <button id="modal-cancel" type="button" class="modal-btn modal-btn-cancel">Cancel</button>
+                <button id="modal-confirm" type="button" class="modal-btn modal-btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="/src/script.js"></script>
 </body>
 </html>
